@@ -19,11 +19,29 @@ class GameScene extends Phaser.Scene {
     }
   
     create() {
-      // 1. Boden / Plattformen
+      // Level Höhe und Breite
+      const levelWidth = 2400;
+      const levelHeight = 720;
+
+      // Physik-Grenzen der Spielwelt
+      this.physics.world.setBounds(0, 0, levelWidth, levelHeight);
+
+      // Plattform-Gruppe erstellen und Plattformen im Level verteilen
       const platforms = this.physics.add.staticGroup();
-      platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+      
+      // Durchgehender Boden über das gesamte Level
+      for (let x = 0; x < levelWidth; x += 400) {
+        platforms.create(x + 200, 584, 'ground').setScale(1).refreshBody();
+      }
+
+      // Schwebende Plattformen auf verschiedenen Höhen
+      platforms.create(500, 490, 'ground');
+      platforms.create(950, 320, 'ground');
+      platforms.create(1350, 420, 'ground');
+      platforms.create(1700, 260, 'ground');
+      platforms.create(2100, 380, 'ground');
   
-      // 2. Kleiner Zauberer (Platzhalter-Grafik)
+      // Zauberer (Platzhalter-Grafik)
       const wizardGfx = this.add.graphics();
       wizardGfx.fillStyle(0x79529f, 1);
       wizardGfx.fillRect(0, 0, 24, 32);
@@ -35,13 +53,17 @@ class GameScene extends Phaser.Scene {
       this.wizard.setBounce(0.1);
   
       this.physics.add.collider(this.wizard, platforms);
-
+      
+      // Items
       const item_mushroom = this.add.image(100, 300, 'mushroom');
       const item_treeresin = this.add.image(500, 450, 'tree-resin');
       const item_herbs = this.add.image(200, 450, 'herbs');
-      //item.setScale(0.05);
+
+      // Kamera konfigurieren
+      this.cameras.main.setBounds(0, 0, levelWidth, levelHeight); // Kamera darf nicht über das Level hinausfilmen
+      this.cameras.main.startFollow(this.wizard, true, 0.08, 0.08); // Verfolgt den Zauberer mit sanfter Verzögerung (Lerp)
   
-      // 3. Tastatursteuerung
+      // Tastatursteuerung
       this.cursors = this.input.keyboard.createCursorKeys();
       this.wasd = this.input.keyboard.addKeys({
         up: Phaser.Input.Keyboard.KeyCodes.W,
