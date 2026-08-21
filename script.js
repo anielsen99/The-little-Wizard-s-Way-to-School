@@ -49,16 +49,12 @@ class GameScene extends Phaser.Scene {
     platforms.create(1700, 260, 'ground');
     platforms.create(2100, 380, 'ground');
 
+
     // Wizard
     // 1. Figur erstellen (nutzt standardmäßig Frame 0)
     this.wizard = this.physics.add.sprite(100, 450, 'wizard');
-
-    
-
-
     this.wizard.setCollideWorldBounds(true);
     this.wizard.setBounce(0.1);
-
     this.physics.add.collider(this.wizard, platforms);
 
     // 2. Lauf-Animation anlegen
@@ -106,29 +102,36 @@ class GameScene extends Phaser.Scene {
     const right = this.cursors.right.isDown || this.wasd.right.isDown;
     const jump = this.cursors.up.isDown || this.wasd.up.isDown || this.wasd.space.isDown;
 
+    // 1. Horizontale Bewegung & Richtung
     if (right) {
       this.wizard.setVelocityX(160);
-      this.wizard.setFlipX(false);          // Figur schaut nach rechts
-      this.wizard.anims.play('walk', true); // Das 'true' verhindert, dass die Animation in jedem Frame neu startet
-    }
-    else if (left) {
+      this.wizard.setFlipX(false);
+    } else if (left) {
       this.wizard.setVelocityX(-160);
-      this.wizard.setFlipX(true);           // Spiegelt die Grafik, damit er nach links schaut
-      this.wizard.anims.play('walk', true);
-    }
-    else {
+      this.wizard.setFlipX(true);
+    } else {
       this.wizard.setVelocityX(0);
-      this.wizard.anims.stop();             // Stoppt die Bewegung
-      this.wizard.setFrame(0);              // Setzt das Bild fest auf Frame 0 (Stehen)
     }
 
-    // Springen (optional: hier könntest du ein spezielles Sprung-Frame setzen)
+    // 2. Sprung-Impuls auslösen (nur wenn Bodenberührung besteht)
     if (jump && this.wizard.body.touching.down) {
       this.wizard.setVelocityY(-350);
     }
 
-
-
+    // 3. Grafische Zuweisung: Luft zustand vs. Bodenzustand
+    if (!this.wizard.body.touching.down) {
+      // FIGURE IST IN DER LUFT:
+      this.wizard.anims.stop(); // Lauf-Animation pausieren/stoppen
+      this.wizard.setFrame(1);  // Frame 1 als Sprung-Bild erzwingen
+    } else {
+      // FIGURE IST AUF DEM BODEN:
+      if (left || right) {
+        this.wizard.anims.play('walk', true); // Laufen abspielen
+      } else {
+        this.wizard.anims.stop();
+        this.wizard.setFrame(1);             // Standbild (Frame 1)
+      }
+    }
 
   }
 }
