@@ -7,7 +7,8 @@ class GameScene extends Phaser.Scene {
       // Assets laden
       this.load.image('ground', 'https://labs.phaser.io/assets/sprites/platform.png');
 
-      this.load.image('mushroom', 'media/mushroom_2.png');
+      this.load.image('mushroom', 'media/mushroom.png');
+      this.load.image('tree-resin', 'media/tree-resin.png');
     }
   
     create() {
@@ -29,6 +30,7 @@ class GameScene extends Phaser.Scene {
       this.physics.add.collider(this.wizard, platforms);
 
       const item = this.add.image(100, 300, 'mushroom');
+      const item = this.add.image(500, 150, 'tree-resin');
       //item.setScale(0.05);
   
       // 3. Tastatursteuerung
