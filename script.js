@@ -17,7 +17,7 @@ class GameScene extends Phaser.Scene {
       const wizardGfx = this.add.graphics();
       wizardGfx.fillStyle(0x79529f, 1);
       wizardGfx.fillRect(0, 0, 24, 32);
-      wizardGfx.generateTexture('wizardPlaceholder', 24, 32);
+      wizardGfx.generateTexture('wizardPlaceholder', 64, 96);
       wizardGfx.destroy();
   
       this.wizard = this.physics.add.sprite(100, 450, 'wizardPlaceholder');
