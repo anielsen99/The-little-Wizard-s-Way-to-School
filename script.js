@@ -28,7 +28,7 @@ class GameScene extends Phaser.Scene {
   
       this.physics.add.collider(this.wizard, platforms);
 
-      const item = this.add.image(300, 520, 'mushroom');
+      const item = this.add.image(100, 300, 'mushroom');
       //item.setScale(0.05);
   
       // 3. Tastatursteuerung
