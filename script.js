@@ -10,6 +10,12 @@ class GameScene extends Phaser.Scene {
       this.load.image('mushroom', 'media/mushroom.png');
       this.load.image('tree-resin', 'media/tree-resin.png');
       this.load.image('herbs', 'media/herbs.png');
+
+      // Audio laden (aus dem Phaser Labs Beispiel)
+      this.load.audio('CatAstroPhi', [
+        'https://labs.phaser.io/assets/audio/CatAstroPhi_shmup_normal.ogg',
+        'https://labs.phaser.io/assets/audio/CatAstroPhi_shmup_normal.mp3'
+      ]);
     }
   
     create() {
@@ -44,6 +50,15 @@ class GameScene extends Phaser.Scene {
         right: Phaser.Input.Keyboard.KeyCodes.D,
         space: Phaser.Input.Keyboard.KeyCodes.SPACE,
       });
+
+      // Musik implementieren
+      this.bgMusic = this.sound.add('CatAstroPhi', {
+        volume: 0.3, // Lautstärke (0.0 bis 1.0)
+        loop: true   // Endlosschleife
+      });
+  
+      // Musik starten
+      this.bgMusic.play();
     }
   
     update() {
