@@ -6,7 +6,7 @@ class GameScene extends Phaser.Scene {
   preload() {
     // Assets laden
     //Boden
-    this.load.image('ground', 'https://labs.phaser.io/assets/sprites/platform.png');
+    this.load.image('ground', 'media/obstacles/plattform_1.png');
 
     //Items
     this.load.image('mushroom', 'media/items/mushroom.png');
@@ -38,7 +38,7 @@ class GameScene extends Phaser.Scene {
     const platforms = this.physics.add.staticGroup();
 
     // Durchgehender Boden über das gesamte Level
-    for (let x = 0; x < levelWidth; x += 400) {
+    for (let x = 0; x < levelWidth; x += 204) {
       platforms.create(x + 200, 584, 'ground').setScale(1).refreshBody();
     }
 
