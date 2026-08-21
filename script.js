@@ -9,6 +9,7 @@ class GameScene extends Phaser.Scene {
 
       this.load.image('mushroom', 'media/mushroom.png');
       this.load.image('tree-resin', 'media/tree-resin.png');
+      this.load.image('herbs', 'media/herbs.png');
     }
   
     create() {
@@ -29,8 +30,9 @@ class GameScene extends Phaser.Scene {
   
       this.physics.add.collider(this.wizard, platforms);
 
-      const item = this.add.image(100, 300, 'mushroom');
+      const item_mushroom = this.add.image(100, 300, 'mushroom');
       const item_treeresin = this.add.image(500, 450, 'tree-resin');
+      const item_herbs = this.add.image(200, 450, 'herbs');
       //item.setScale(0.05);
   
       // 3. Tastatursteuerung
@@ -68,6 +70,7 @@ class GameScene extends Phaser.Scene {
     type: Phaser.AUTO,
     width: 1280,
     height: 720,
+    backgroundColor: '#07150d',
     pixelArt: true,
     physics: {
       default: 'arcade',
