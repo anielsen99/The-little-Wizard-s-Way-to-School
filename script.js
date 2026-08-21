@@ -129,7 +129,7 @@ class GameScene extends Phaser.Scene {
         this.wizard.anims.play('walk', true); // Laufen abspielen
       } else {
         this.wizard.anims.stop();
-        this.wizard.setFrame(1);             // Standbild (Frame 1)
+        this.wizard.setFrame(0);             // Standbild (Frame 0)
       }
     }
 
