@@ -10,6 +10,7 @@ class GameScene extends Phaser.Scene {
       this.load.image('mushroom', 'media/mushroom.png');
       this.load.image('tree-resin', 'media/tree-resin.png');
       this.load.image('herbs', 'media/herbs.png');
+      this.load.image('wizard', 'media/wizard-standing-right.png');
 
       // Audio laden (aus dem Phaser Labs Beispiel)
       this.load.audio('CatAstroPhi', [
@@ -45,10 +46,10 @@ class GameScene extends Phaser.Scene {
       const wizardGfx = this.add.graphics();
       wizardGfx.fillStyle(0x79529f, 1);
       wizardGfx.fillRect(0, 0, 24, 32);
-      wizardGfx.generateTexture('wizardPlaceholder', 64, 96);
+      wizardGfx.generateTexture('wizard', 64, 96);
       wizardGfx.destroy();
   
-      this.wizard = this.physics.add.sprite(100, 450, 'wizardPlaceholder');
+      this.wizard = this.physics.add.sprite(100, 450, 'wizard');
       this.wizard.setCollideWorldBounds(true);
       this.wizard.setBounce(0.1);
   
@@ -58,6 +59,7 @@ class GameScene extends Phaser.Scene {
       const item_mushroom = this.add.image(100, 300, 'mushroom');
       const item_treeresin = this.add.image(500, 450, 'tree-resin');
       const item_herbs = this.add.image(200, 450, 'herbs');
+  
 
       // Kamera konfigurieren
       this.cameras.main.setBounds(0, 0, levelWidth, levelHeight); // Kamera darf nicht über das Level hinausfilmen
