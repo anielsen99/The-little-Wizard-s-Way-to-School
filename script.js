@@ -38,7 +38,7 @@ class GameScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, levelWidth, levelHeight);
 
     // Schloss platzieren
-    const castle_closed = this.add.image(1210, 370, 'castle-closed');
+    const castle_closed = this.add.image(1210, 360, 'castle-closed');
 
     // Plattform-Gruppe erstellen und Plattformen im Level verteilen
     const platforms = this.physics.add.staticGroup();
