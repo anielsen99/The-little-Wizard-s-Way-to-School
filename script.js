@@ -5,8 +5,11 @@ class GameScene extends Phaser.Scene {
 
   preload() {
     // Assets laden
-    //Boden
+    //Ground
     this.load.image('ground', 'media/obstacles/plattform_2.png');
+
+    //Castle
+    this.load.image('castle-closed', 'media/castle/castle-closed.png');
 
     //Items
     this.load.image('mushroom', 'media/items/mushroom.png');
@@ -33,6 +36,9 @@ class GameScene extends Phaser.Scene {
 
     // Physik-Grenzen der Spielwelt
     this.physics.world.setBounds(0, 0, levelWidth, levelHeight);
+
+    // Schloss platzieren
+    const castle_closed = this.add.image(1210, 370, 'castle-closed');
 
     // Plattform-Gruppe erstellen und Plattformen im Level verteilen
     const platforms = this.physics.add.staticGroup();
