@@ -1,7 +1,7 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #1a1a24; /* Dunkler Hintergrund passend zum Spiel */
+    background-color: #1a1a24; /* Dunkler Hintergrund passend zum Spiel*/
     display: flex;
     justify-content: center;
     align-items: center;

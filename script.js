@@ -5,8 +5,9 @@ class GameScene extends Phaser.Scene {
 
   preload() {
     // Assets laden
-    //Ground
-    this.load.image('ground', 'media/obstacles/plattform.png');
+    // Obstacles
+    this.load.image('ground', 'media/obstacles/ground.png')
+    this.load.image('plattform', 'media/obstacles/plattform.png');
 
     //Castle
     this.load.image('castle-closed', 'media/castle/castle-closed.png');
@@ -38,22 +39,22 @@ class GameScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, levelWidth, levelHeight);
 
     // Schloss platzieren
-    const castle_closed = this.add.image(1210, 360, 'castle-closed');
+    const castle_closed = this.add.image(1210, 440, 'castle-closed');
 
     // Plattform-Gruppe erstellen und Plattformen im Level verteilen
     const platforms = this.physics.add.staticGroup();
 
     // Durchgehender Boden über das gesamte Level
     for (let x = 0; x < levelWidth; x += 204) {
-      platforms.create(x + 200, 584, 'ground').setScale(1).refreshBody();
+      platforms.create(x + 100, 688, 'ground').setScale(1).refreshBody();
     }
 
     // Schwebende Plattformen auf verschiedenen Höhen
-    platforms.create(500, 490, 'ground');
-    platforms.create(950, 320, 'ground');
-    platforms.create(1350, 420, 'ground');
-    platforms.create(1700, 260, 'ground');
-    platforms.create(2100, 380, 'ground');
+    platforms.create(500, 490, 'plattform');
+    platforms.create(950, 320, 'plattform');
+    platforms.create(1350, 420, 'plattform');
+    platforms.create(1700, 260, 'plattform');
+    platforms.create(2100, 380, 'plattform');
 
 
     // Wizard
