@@ -39,7 +39,7 @@ class GameScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, levelWidth, levelHeight);
 
     // Schloss platzieren
-    const castle_closed = this.add.image(1210, 440, 'castle-closed');
+    const castle_closed = this.add.image(2330, 440, 'castle-closed');
 
     // Plattform-Gruppe erstellen und Plattformen im Level verteilen
     const platforms = this.physics.add.staticGroup();
@@ -78,7 +78,6 @@ class GameScene extends Phaser.Scene {
     const item_mushroom = this.add.image(100, 300, 'mushroom');
     const item_treeresin = this.add.image(500, 450, 'tree-resin');
     const item_herbs = this.add.image(200, 450, 'herbs');
-
 
     // Kamera konfigurieren
     this.cameras.main.setBounds(0, 0, levelWidth, levelHeight); // Kamera darf nicht über das Level hinausfilmen
