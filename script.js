@@ -6,7 +6,7 @@ class GameScene extends Phaser.Scene {
   preload() {
     // Assets laden
     //Ground
-    this.load.image('ground', 'media/obstacles/plattform_2.png');
+    this.load.image('ground', 'media/obstacles/plattform.png');
 
     //Castle
     this.load.image('castle-closed', 'media/castle/castle-closed.png');
