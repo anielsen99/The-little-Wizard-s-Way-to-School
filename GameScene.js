@@ -180,10 +180,6 @@ export class GameScene extends Phaser.Scene {
         this.wizard.setFrame(0);             // Standbild (Frame 0)
       }
     }
-
-
-
-
   }
 
   // Items einsammeln

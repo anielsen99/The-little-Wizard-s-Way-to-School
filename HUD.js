@@ -5,12 +5,17 @@ export class HUD {
       this.quotas = {};
     }
   
-    create(quotas = { 'mushroom': 5, 'tree-resin': 5, 'herbs': 5 }) {
+    create(quotas) {
       this.quotas = quotas;
   
       const hudBg = this.scene.add.graphics();
-      hudBg.fillStyle(0x050d09, 0.75);
-      hudBg.fillRoundedRect(20, 15, 360, 50, 8);
+      // Hintergrund
+      hudBg.fillStyle(0x000000, 0.75);
+      hudBg.fillRoundedRect(20, 15, 360, 50, 0);
+      // Rand
+      hudBg.lineStyle(2, 0xff6666, 0.9);
+      hudBg.strokeRoundedRect(20, 15, 360, 50, 0);
+      //
       hudBg.setScrollFactor(0);
       hudBg.setDepth(100);
   
