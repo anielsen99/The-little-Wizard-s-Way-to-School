@@ -7,7 +7,7 @@ export class MenuScene extends Phaser.Scene {
       const centerX = this.scale.width / 2;
       const centerY = this.scale.height / 2;
   
-      this.add.text(centerX, centerY - 100, "The Little Wizard's Journey", {
+      this.add.text(centerX, centerY - 100, "The Little Wizard's Way to School", {
         fontSize: '32px',
         color: '#e0d6ff',
         fontFamily: 'monospace',
