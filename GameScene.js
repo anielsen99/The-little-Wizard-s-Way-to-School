@@ -1,3 +1,5 @@
+import { HUD } from './HUD.js';
+
 export class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
@@ -39,15 +41,11 @@ export class GameScene extends Phaser.Scene {
     const levelWidth = 2400;
     const levelHeight = 720;
 
-    // 1. Hintergrund als allererstes Element zeichnen:
-    // Option A: Fester Hintergrund, der mit der Kamera mitscrollt (Parallax-Effekt)
+    // Hintergrund
     const bg = this.add.image(0, 0, 'background')
       .setOrigin(0, 0)
       .setDisplaySize(1280, 720)   // Passt das Bild an die Bildschirmgröße an
       .setScrollFactor(0);         // 0 = fixiert am Bildschirm (scrollt nicht weg)
-
-    // 2. Physik-Grenzen & restlicher Code...
-
 
     // Physik-Grenzen der Spielwelt
     this.physics.world.setBounds(0, 0, levelWidth, levelHeight);
@@ -70,7 +68,6 @@ export class GameScene extends Phaser.Scene {
     platforms.create(1700, 360, 'plattform');
     platforms.create(2100, 480, 'plattform');
 
-
     // Wizard
     // 1. Figur erstellen (nutzt standardmäßig Frame 0)
     this.wizard = this.physics.add.sprite(100, 450, 'wizard');
@@ -87,14 +84,13 @@ export class GameScene extends Phaser.Scene {
       repeat: -1        // -1 bedeutet: Die Animation wiederholt sich endlos
     });
 
-
+    // ----------------------------
     // Items
-
+    // ----------------------------
     // 1. Eine STATISCHE Physik-Gruppe für alle Items erstellen
     this.items = this.physics.add.staticGroup();
 
     // 2. Items frei im Level verteilen (X, Y, Bild-Key)
-    // Beispiele auf Plattformen oder frei in der Luft zum Anspringen:
     this.items.create(300, 640, 'mushroom');
     this.items.create(550, 440, 'mushroom'); // Steht auf der 1. Plattform
 
@@ -111,14 +107,19 @@ export class GameScene extends Phaser.Scene {
       'herbs': 0
     };
 
-    // 4. Overlap-Prüfung aktivieren (bleibt genau wie vorher!)
-    this.physics.add.overlap(this.wizard, this.items, this.collectItem, null, this);
+    // Quoten für Level 1 festlegen
+    this.quotas = {
+      'mushroom': 2,
+      'tree-resin': 2,
+      'herbs': 2
+    };
 
-    /*
-    const item_mushroom = this.add.image(100, 300, 'mushroom');
-    const item_treeresin = this.add.image(500, 450, 'tree-resin');
-    const item_herbs = this.add.image(200, 450, 'herbs');
-    */
+    // HUD initialisieren
+    this.hud = new HUD(this);
+    this.hud.create(this.quotas);
+
+    // Overlap-Prüfung aktivieren
+    this.physics.add.overlap(this.wizard, this.items, this.collectItem, null, this);
 
     // Kamera konfigurieren
     this.cameras.main.setBounds(0, 0, levelWidth, levelHeight); // Kamera darf nicht über das Level hinausfilmen
@@ -187,18 +188,14 @@ export class GameScene extends Phaser.Scene {
 
   // Items einsammeln
   collectItem(wizard, item) {
-    // Phaser speichert den Bild-Namen ('mushroom', 'tree-resin' oder 'herbs') in item.texture.key
     const itemType = item.texture.key;
 
-    // Prüfen, ob von dieser Sorte noch weniger als 5 gesammelt wurden
-    if (this.inventory[itemType] < 5) {
-      // Zähler der jeweiligen Sorte um 1 erhöhen
+    if (this.inventory[itemType] < this.quotas[itemType]) {
       this.inventory[itemType] += 1;
 
-      // Zum Testen in der Entwickler-Konsole ausgeben:
-      console.log(`Gesammelt: ${itemType} = ${this.inventory[itemType]}/5`);
+      // HUD-Zähler aktualisieren:
+      this.hud.updateCounter(itemType, this.inventory[itemType]);
 
-      // Das eingesammelte Item unsichtbar machen & Physik deaktivieren
       item.disableBody(true, true);
     }
   }
