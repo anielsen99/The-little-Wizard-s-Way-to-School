@@ -1,5 +1,5 @@
-import { GameScene } from '/GameScene.js';
-import { MenuScene } from '/MenuScene.js';
+import { GameScene } from './GameScene.js';
+import { MenuScene } from './MenuScene.js';
 
 // Konfiguration
 const config = {

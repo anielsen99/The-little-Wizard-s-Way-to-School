@@ -5,6 +5,10 @@ export class GameScene extends Phaser.Scene {
 
   preload() {
     // Assets laden
+
+    // Hintergrund
+    this.load.image('background', 'media/background_2.jpg')
+
     // Obstacles
     this.load.image('ground', 'media/obstacles/ground.png')
     this.load.image('plattform', 'media/obstacles/plattform.png');
@@ -35,6 +39,16 @@ export class GameScene extends Phaser.Scene {
     const levelWidth = 2400;
     const levelHeight = 720;
 
+    // 1. Hintergrund als allererstes Element zeichnen:
+    // Option A: Fester Hintergrund, der mit der Kamera mitscrollt (Parallax-Effekt)
+    const bg = this.add.image(0, 0, 'background')
+      .setOrigin(0, 0)
+      .setDisplaySize(1280, 720)   // Passt das Bild an die Bildschirmgröße an
+      .setScrollFactor(0);         // 0 = fixiert am Bildschirm (scrollt nicht weg)
+
+    // 2. Physik-Grenzen & restlicher Code...
+
+
     // Physik-Grenzen der Spielwelt
     this.physics.world.setBounds(0, 0, levelWidth, levelHeight);
 
@@ -50,11 +64,11 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Schwebende Plattformen auf verschiedenen Höhen
-    platforms.create(500, 490, 'plattform');
-    platforms.create(950, 320, 'plattform');
-    platforms.create(1350, 420, 'plattform');
-    platforms.create(1700, 260, 'plattform');
-    platforms.create(2100, 380, 'plattform');
+    platforms.create(500, 500, 'plattform');
+    platforms.create(950, 420, 'plattform');
+    platforms.create(1350, 520, 'plattform');
+    platforms.create(1700, 360, 'plattform');
+    platforms.create(2100, 480, 'plattform');
 
 
     // Wizard
@@ -99,10 +113,6 @@ export class GameScene extends Phaser.Scene {
 
     // 4. Overlap-Prüfung aktivieren (bleibt genau wie vorher!)
     this.physics.add.overlap(this.wizard, this.items, this.collectItem, null, this);
-
-
-
-
 
     /*
     const item_mushroom = this.add.image(100, 300, 'mushroom');
@@ -152,7 +162,7 @@ export class GameScene extends Phaser.Scene {
 
     // 2. Sprung-Impuls auslösen (nur wenn Bodenberührung besteht)
     if (jump && this.wizard.body.touching.down) {
-      this.wizard.setVelocityY(-350);
+      this.wizard.setVelocityY(-450);
     }
 
     // 3. Grafische Zuweisung: Luft zustand vs. Bodenzustand
