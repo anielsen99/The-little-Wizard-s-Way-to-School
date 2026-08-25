@@ -6,6 +6,10 @@ export class MenuScene extends Phaser.Scene {
   preload() {
     // Hintergrund
     this.load.image('bg-menu', 'media//backgrounds/background_menu.jpg')
+
+    // Soundeffekt laden
+    this.load.audio('sound-button-menu', 'audio/Trap_00.mp3');
+
   }
 
   create() {
@@ -39,6 +43,8 @@ export class MenuScene extends Phaser.Scene {
 
     playButton.on('pointerover', () => {
       playButton.setStyle({ color: '#ffff55', backgroundColor: '#1b4332' });
+      // Soundeffekt abspielen
+      this.sound.play('sound-button-menu', { volume: 1 });
     });
 
     playButton.on('pointerout', () => {

@@ -40,11 +40,14 @@ export class GameScene extends Phaser.Scene {
     // Map Level 1
     this.load.tilemapTiledJSON('map', 'maps/level-1.tmj');
 
-    // Audio laden (aus dem Phaser Labs Beispiel)
+    // Audio laden
+    // Musik während Level
     this.load.audio('CatAstroPhi', [
       'https://labs.phaser.io/assets/audio/CatAstroPhi_shmup_normal.ogg',
       'https://labs.phaser.io/assets/audio/CatAstroPhi_shmup_normal.mp3'
     ]);
+
+    
   };
 
   // ============================================================================================
@@ -114,7 +117,7 @@ export class GameScene extends Phaser.Scene {
         const enemy = this.enemies.create(obj.x, obj.y - 24, 'slime-enemy');
         enemy.play('enemy_walk');
         enemy.setCollideWorldBounds(true);
-        
+
         // Startrichtung speichern (-1 = links, 1 = rechts)
         enemy.setData('direction', -1);
       });
@@ -253,7 +256,7 @@ export class GameScene extends Phaser.Scene {
         if (!enemy.getData('isWaiting')) {
           enemy.setData('isWaiting', true);
           enemy.setVelocityX(0); // Bewegung stoppen
-          
+
           // PHASE 1: Kurzes Stauchen bei der Landung (Frame 1)
           enemy.setFrame(1);
 
