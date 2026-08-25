@@ -6,6 +6,9 @@ export class CreditsScene extends Phaser.Scene {
   preload() {
     // Hintergrundbild laden
     this.load.image('bg-menu', 'media//backgrounds/background_menu.jpg')
+
+    // Soundeffect laden
+    this.load.audio('hover-button-sound', '/audio/Pickup_Gold_00.mp3')
   }
 
   create() {
@@ -91,7 +94,13 @@ export class CreditsScene extends Phaser.Scene {
     .setOrigin(0.5)
     .setInteractive({ useHandCursor: true });
 
-    backBtn.on('pointerover', () => backBtn.setStyle({ backgroundColor: '#3a3a3a' }));
+    backBtn.on('pointerover', () => {
+      backBtn.setStyle({ backgroundColor: '#3a3a3a' });
+      // Soundeffekt abspielen
+      this.sound.play('hover-button-sound', { volume: 0.3 });
+    });
+
+
     backBtn.on('pointerout', () => backBtn.setStyle({ backgroundColor: '#1f1f1f' }));
     backBtn.on('pointerdown', () => {
       this.scene.start('MenuScene');
