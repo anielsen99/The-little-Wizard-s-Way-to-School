@@ -184,7 +184,7 @@ export class GameScene extends Phaser.Scene {
 
     // 2. Sprung (onFloor prüft sowohl Kacheln als auch Plattformen)
     if (jump && this.wizard.body.onFloor()) {
-      this.wizard.setVelocityY(-450);
+      this.wizard.setVelocityY(-500);
     }
 
     // 3. Animationen
