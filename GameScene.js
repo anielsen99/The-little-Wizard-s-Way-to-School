@@ -11,7 +11,7 @@ export class GameScene extends Phaser.Scene {
     // Assets laden
 
     // Hintergrund
-    this.load.image('background', 'media//backgrounds/background_level-1.jpg')
+    this.load.image('bg-game', 'media//backgrounds/background_level-1.jpg')
 
     // Castle
     this.load.image('castle-closed', 'media/castle/castle-closed.png');
@@ -54,7 +54,7 @@ export class GameScene extends Phaser.Scene {
     const levelHeight = 720;
 
     // Hintergrund
-    const bg = this.add.image(0, 0, 'background')
+    const bg = this.add.image(0, 0, 'bg-game')
       .setOrigin(0, 0)
       .setDisplaySize(1280, 720)   // Passt das Bild an die Bildschirmgröße an
       .setScrollFactor(0);         // 0 = fixiert am Bildschirm (scrollt nicht weg)

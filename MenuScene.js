@@ -5,13 +5,13 @@ export class MenuScene extends Phaser.Scene {
 
   preload() {
     // Hintergrund
-    this.load.image('background', 'media//backgrounds/background_menu.jpg')
+    this.load.image('bg-menu', 'media//backgrounds/background_menu.jpg')
   }
 
   create() {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
-    const bg = this.add.image(0, 0, 'background')
+    const bg = this.add.image(0, 0, 'bg-menu')
       .setOrigin(0, 0)
       .setDisplaySize(width, height)
       .setDepth(-1)
