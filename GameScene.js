@@ -116,6 +116,31 @@ export class GameScene extends Phaser.Scene {
     // Kollision mit Boden & Plattformen aktivieren
     this.physics.add.collider(this.enemies, groundLayer);
 
+    // ----------------------------
+    // Unsichtbare Gegner-Wände (enemy-barrier)
+    // ----------------------------
+    this.enemyBarriers = this.physics.add.staticGroup();
+
+    const barrierLayer = map.getObjectLayer('enemy-barrier');
+    if (barrierLayer) {
+      barrierLayer.objects.forEach(obj => {
+        // Falls in Tiled als Rechteck gezeichnet, Maße übernehmen – sonst 32x64px Standard
+        const width = obj.width > 0 ? obj.width : 32;
+        const height = obj.height > 0 ? obj.height : 64;
+        const posX = obj.x + (obj.width > 0 ? width / 2 : 0);
+        const posY = obj.y + (obj.height > 0 ? height / 2 : -height / 2);
+
+        // Unsichtbaren Kasten als statischen Körper erstellen
+        const barrier = this.add.rectangle(posX, posY, width, height);
+        barrier.setVisible(false); // Macht die Wand unsichtbar
+        this.physics.add.existing(barrier, true); // true = statischer physikalischer Körper
+        this.enemyBarriers.add(barrier);
+      });
+    }
+
+    // Gegner kollidieren mit den unsichtbaren Wänden
+    this.physics.add.collider(this.enemies, this.enemyBarriers);
+
     // Berührung mit Zauberer führt zum Tod
     this.physics.add.overlap(this.wizard, this.enemies, this.die, null, this);
 
@@ -189,14 +214,25 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    // Gegner animieren
-  this.enemies.getChildren().forEach(enemy => {
-    if (enemy.body.velocity.x > 0) {
-      enemy.setFlipX(true);  // Schaut nach rechts
-    } else if (enemy.body.velocity.x < 0) {
-      enemy.setFlipX(false); // Schaut nach links
-    }
-  });
+    // In update(): Gegner-Umkehrung bei Hindernissen & Animation
+    // In update():
+    this.enemies.getChildren().forEach(enemy => {
+      // Wand rechts berührt -> nach links umdrehen
+      if (enemy.body.blocked.right || enemy.body.touching.right) {
+        enemy.setVelocityX(-80);
+      } 
+      // Wand links berührt -> nach rechts umdrehen
+      else if (enemy.body.blocked.left || enemy.body.touching.left) {
+        enemy.setVelocityX(80);
+      }
+
+      // Blickrichtung anpassen
+      if (enemy.body.velocity.x > 0) {
+        enemy.setFlipX(true);  // Schaut nach rechts
+      } else if (enemy.body.velocity.x < 0) {
+        enemy.setFlipX(false); // Schaut nach links
+      }
+    });
 
     const left = this.cursors.left.isDown || this.wasd.left.isDown;
     const right = this.cursors.right.isDown || this.wasd.right.isDown;
@@ -232,7 +268,7 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  
+
 
   // Items einsammeln
   collectItem(wizard, item) {
