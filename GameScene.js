@@ -26,6 +26,13 @@ export class GameScene extends Phaser.Scene {
       frameHeight: 104
     });
 
+    // Slime-enemy
+    // Pass deine Frame-Maße an (frameWidth / frameHeight)
+    this.load.spritesheet('slime-enemy', 'media/enemies/spritesheet-slime.png', {
+      frameWidth: 48,
+      frameHeight: 48
+    });
+
     // Tiles
     this.load.image('tiles-set', 'media/tiles.png');
 
@@ -79,6 +86,38 @@ export class GameScene extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers('wizard', { frames: [0, 1, 0, 2] }),
       frameRate: 8,     // Wie schnell die Bilder wechseln (8 Bilder pro Sekunde)
       repeat: -1        // -1 bedeutet: Die Animation wiederholt sich endlos
+    });
+
+    // Slime-enemy
+    // 1. Animation definieren (Frames 0, 1, 2)
+    this.anims.create({
+      key: 'enemy_walk',
+      frames: this.anims.generateFrameNumbers('slime-enemy', { start: 0, end: 2 }),
+      frameRate: 6, // Geschwindigkeit der Animation
+      repeat: -1    // Endlosschleife
+    });
+
+    // 1. Physikalische Gruppe für Gegner anlegen
+    this.enemies = this.physics.add.group();
+
+    // 2. Objektebene aus der Tiled-Map abrufen ('Gegner' = Name der Objektebene in Tiled)
+    const enemyObjects = map.getObjectLayer('Gegner').objects;
+
+    enemyObjects.forEach(obj => {
+      // Sprite an der Position des Tiled-Objekts erstellen
+      const enemy = this.enemies.create(obj.x, obj.y, 'enemy_sheet');
+
+      // Animation starten
+      enemy.play('enemy_walk');
+
+      // Startgeschwindigkeit nach links setzen
+      enemy.setVelocityX(-80);
+
+      // Macht, dass der Gegner bei Kollision physikalisch abprallt
+      enemy.setBounce(1, 0);
+
+      // Verhindert, dass der Gegner bei Kollisionen rotiert
+      enemy.setFixedRotation();
     });
 
     // ----------------------------
