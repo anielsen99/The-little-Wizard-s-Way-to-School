@@ -100,12 +100,12 @@ export class GameScene extends Phaser.Scene {
     // 1. Physikalische Gruppe für Gegner anlegen
     this.enemies = this.physics.add.group();
 
-    // 2. Objektebene aus der Tiled-Map abrufen ('Gegner' = Name der Objektebene in Tiled)
-    const enemyObjects = map.getObjectLayer('Gegner').objects;
+    // 2. Objektebene aus der Tiled-Map abrufen ('enemies' = Name der Objektebene in Tiled)
+    const enemyObjects = map.getObjectLayer('enemies').objects;
 
     enemyObjects.forEach(obj => {
       // Sprite an der Position des Tiled-Objekts erstellen
-      const enemy = this.enemies.create(obj.x, obj.y, 'enemy_sheet');
+      const enemy = this.enemies.create(obj.x, obj.y, 'slime-enemy');
 
       // Animation starten
       enemy.play('enemy_walk');
@@ -119,6 +119,11 @@ export class GameScene extends Phaser.Scene {
       // Verhindert, dass der Gegner bei Kollisionen rotiert
       enemy.setFixedRotation();
     });
+
+    // 'tiles' ist dein Plattform-Layer aus Tiled mit setCollisionByProperty()
+    this.physics.add.collider(this.enemies, groundLayer);
+
+    
 
     // ----------------------------
     // Items
@@ -191,6 +196,15 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
+    // Gegner animieren
+  this.enemies.getChildren().forEach(enemy => {
+    if (enemy.body.velocity.x > 0) {
+      enemy.setFlipX(true);  // Schaut nach rechts
+    } else if (enemy.body.velocity.x < 0) {
+      enemy.setFlipX(false); // Schaut nach links
+    }
+  });
+
     const left = this.cursors.left.isDown || this.wasd.left.isDown;
     const right = this.cursors.right.isDown || this.wasd.right.isDown;
     const jump = this.cursors.up.isDown || this.wasd.up.isDown || this.wasd.space.isDown;
@@ -224,6 +238,8 @@ export class GameScene extends Phaser.Scene {
       }
     }
   }
+
+  
 
   // Items einsammeln
   collectItem(wizard, item) {
