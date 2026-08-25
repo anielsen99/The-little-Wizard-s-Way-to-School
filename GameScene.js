@@ -99,17 +99,6 @@ export class GameScene extends Phaser.Scene {
       });
     }
 
-    /*
-    // 2. Items frei im Level verteilen (X, Y, Bild-Key)
-    this.items.create(300, 640, 'mushroom');
-    this.items.create(550, 440, 'mushroom'); // Steht auf der 1. Plattform
-
-    this.items.create(980, 270, 'tree-resin'); // Steht auf der 2. Plattform
-    this.items.create(1200, 500, 'tree-resin');
-
-    this.items.create(1380, 370, 'herbs');      // Steht auf der 3. Plattform
-    this.items.create(1750, 200, 'herbs');      // Hoch in der Luft über Plattform 4
-    */
 
     // 3. Zähler-Objekt für dein Inventar
     this.inventory = {
@@ -175,7 +164,7 @@ export class GameScene extends Phaser.Scene {
 
     // 2. Sprung (onFloor prüft sowohl Kacheln als auch Plattformen)
     if (jump && this.wizard.body.onFloor()) {
-      this.wizard.setVelocityY(-450);
+      this.wizard.setVelocityY(-600);
     }
 
     // 3. Animationen
