@@ -1,4 +1,5 @@
 import { HUD } from './HUD.js';
+import { Overlay } from './Overlay.js';
 
 export class GameScene extends Phaser.Scene {
   constructor() {
@@ -112,9 +113,10 @@ export class GameScene extends Phaser.Scene {
       'herbs': 2
     };
 
-    // HUD initialisieren
+    // HUD & Overlay initialisieren
     this.hud = new HUD(this);
     this.hud.create(this.quotas);
+    this.overlay = new Overlay(this)
 
     // Overlap-Prüfung aktivieren
     this.physics.add.overlap(this.wizard, this.items, this.collectItem, null, this);
@@ -152,7 +154,7 @@ export class GameScene extends Phaser.Scene {
       this.die();
       return;
     }
-    
+
     const left = this.cursors.left.isDown || this.wasd.left.isDown;
     const right = this.cursors.right.isDown || this.wasd.right.isDown;
     const jump = this.cursors.up.isDown || this.wasd.up.isDown || this.wasd.space.isDown;
@@ -203,25 +205,20 @@ export class GameScene extends Phaser.Scene {
 
   // Spieler stirbt und Level startet neu
   die() {
+    if (this.isDead) return;
     this.isDead = true;
-
+  
     // Bewegung stoppen & Figur rot einfärben
     this.wizard.setVelocity(0, 0);
     this.wizard.setTint(0xff5555);
-
-    // Bildschirm kurz rot aufblitzen lassen und abdunkeln
-    this.cameras.main.flash(200, 255, 0, 0);
-    this.cameras.main.fade(300, 0, 0, 0);
-
+  
     // Musik stoppen
     if (this.bgMusic) {
       this.bgMusic.stop();
     }
-
-    // Nach dem Ausblenden die Szene komplett neu laden
-    this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.restart();
-    });
+  
+    // Overlay anzeigen statt sofortigem Auto-Neustart
+    this.overlay.showGameOver();
   }
 }
 
