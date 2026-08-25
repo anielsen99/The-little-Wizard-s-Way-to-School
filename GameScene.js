@@ -39,7 +39,7 @@ export class GameScene extends Phaser.Scene {
   create() {
     // Level Höhe und Breite
     const levelWidth = 2400;
-    const levelHeight = 720;
+    const levelHeight = 704;
 
     // Hintergrund
     const bg = this.add.image(0, 0, 'background')
