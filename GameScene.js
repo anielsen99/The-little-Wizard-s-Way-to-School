@@ -41,7 +41,7 @@ export class GameScene extends Phaser.Scene {
 
   create() {
     // Level Höhe und Breite
-    const levelWidth = 2400;
+    const levelWidth = 3840;
     const levelHeight = 720;
 
     // Hintergrund
@@ -53,9 +53,6 @@ export class GameScene extends Phaser.Scene {
     // Physik-Grenzen der Spielwelt
     this.physics.world.setBounds(0, 0, levelWidth, levelHeight);
     this.physics.world.setBoundsCollision(true, true, false, false);
-
-    // Schloss platzieren
-    const castle_closed = this.add.image(2330, 440, 'castle-closed');
 
     // Tilemap aus dem Cache erstellen
     const map = this.make.tilemap({ key: 'map' });
@@ -98,20 +95,22 @@ export class GameScene extends Phaser.Scene {
         this.items.create(obj.x, obj.y, obj.name);
       });
     }
-
-    // 3. Zähler-Objekt für dein Inventar
+    // Zähler-Objekt für dein Inventar
     this.inventory = {
       'mushroom': 0,
       'tree-resin': 0,
       'herbs': 0
     };
-
     // Quoten für Level 1 festlegen
     this.quotas = {
       'mushroom': 2,
       'tree-resin': 2,
       'herbs': 2
     };
+
+    // Schloss
+    this.castle = this.physics.add.staticImage(3800, 440, 'castle-closed');
+    this.physics.add.overlap(this.wizard, this.castle, this.win, null, this);
 
     // HUD & Overlay initialisieren
     this.hud = new HUD(this);
@@ -140,14 +139,12 @@ export class GameScene extends Phaser.Scene {
       volume: 0.3, // Lautstärke (0.0 bis 1.0)
       loop: true   // Endlosschleife
     });
-
-    // Musik starten
     this.bgMusic.play();
   }
 
   update() {
     // Wenn der Zauberer bereits stirbt, Steuerung ignorieren
-    if (this.isDead) return;
+    if (this.isDead || this.hasWon) return;
 
     // Prüfen, ob der Zauberer unter den Bildschirm gefallen ist (Höhe > 720)
     if (this.wizard.y > 750) {
@@ -159,7 +156,7 @@ export class GameScene extends Phaser.Scene {
     const right = this.cursors.right.isDown || this.wasd.right.isDown;
     const jump = this.cursors.up.isDown || this.wasd.up.isDown || this.wasd.space.isDown;
 
-    // 1. Horizontale Bewegung & Richtung
+    // Horizontale Bewegung & Richtung
     if (right) {
       this.wizard.setVelocityX(160);
       this.wizard.setFlipX(false);
@@ -170,12 +167,12 @@ export class GameScene extends Phaser.Scene {
       this.wizard.setVelocityX(0);
     }
 
-    // 2. Sprung (onFloor prüft sowohl Kacheln als auch Plattformen)
+    // Sprung (onFloor prüft sowohl Kacheln als auch Plattformen)
     if (jump && this.wizard.body.onFloor()) {
       this.wizard.setVelocityY(-600);
     }
 
-    // 3. Animationen
+    // Animationen
     if (!this.wizard.body.onFloor()) {
       this.wizard.anims.stop();
       this.wizard.setFrame(1);
@@ -196,9 +193,8 @@ export class GameScene extends Phaser.Scene {
     if (this.inventory[itemType] < this.quotas[itemType]) {
       this.inventory[itemType] += 1;
 
-      // HUD-Zähler aktualisieren:
+      // HUD-Zähler aktualisieren
       this.hud.updateCounter(itemType, this.inventory[itemType]);
-
       item.disableBody(true, true);
     }
   }
@@ -207,18 +203,50 @@ export class GameScene extends Phaser.Scene {
   die() {
     if (this.isDead) return;
     this.isDead = true;
-  
+
+    // Physik & Verfolgung stoppen
+    this.physics.pause();
+    this.cameras.main.stopFollow();
+
     // Bewegung stoppen & Figur rot einfärben
     this.wizard.setVelocity(0, 0);
     this.wizard.setTint(0xff5555);
-  
+
     // Musik stoppen
     if (this.bgMusic) {
       this.bgMusic.stop();
     }
-  
-    // Overlay anzeigen statt sofortigem Auto-Neustart
+
+    // Overlay anzeigen
     this.overlay.showGameOver();
+  }
+
+  // Wird automatisch von Phaser aufgerufen, sobald der Zauberer das Schloss berührt
+  win(wizard, castle) {
+    // Abbrechen, wenn das Level bereits beendet oder der Spieler tot ist
+    if (this.hasWon || this.isDead) return;
+
+    // Prüfen, ob alle Quoten erfüllt sind
+    const hasAllItems =
+      this.inventory['mushroom'] >= this.quotas['mushroom'] &&
+      this.inventory['tree-resin'] >= this.quotas['tree-resin'] &&
+      this.inventory['herbs'] >= this.quotas['herbs'];
+
+    if (hasAllItems) {
+      this.hasWon = true;
+
+      // Physik & Verfolgung stoppen
+      this.physics.pause();
+      this.cameras.main.stopFollow();
+
+      // Musik stoppen
+      if (this.bgMusic) {
+        this.bgMusic.stop();
+      }
+
+      // Win-Overlay anzeigen
+      this.overlay.showWin();
+    }
   }
 }
 
