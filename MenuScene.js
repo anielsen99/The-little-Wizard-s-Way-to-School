@@ -5,7 +5,12 @@ export class MenuScene extends Phaser.Scene {
 
   preload() {
     // Hintergrund
-    this.load.image('bg-menu', 'media//backgrounds/background_menu.jpg')
+    this.load.image('bg-menu', 'media/backgrounds/background_menu.jpg')
+
+    // Soundeffect laden
+    this.load.audio('hover-button-sound', '/audio/Pickup_Gold_00.mp3')
+
+
   }
 
   create() {
@@ -37,9 +42,13 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
-    playButton.on('pointerover', () => {playButton.setStyle({ color: '#ffff55', backgroundColor: '#1b4332' });});
-    playButton.on('pointerout', () => {playButton.setStyle({ color: '#55ff99', backgroundColor: '#081c15' });});
-    playButton.on('pointerdown', () => {this.scene.start('GameScene');});
+    playButton.on('pointerover', () => {
+      playButton.setStyle({ color: '#ffff55', backgroundColor: '#1b4332' });
+      // Soundeffekt abspielen
+      this.sound.play('hover-button-sound', { volume: 0.3 });
+    });
+    playButton.on('pointerout', () => { playButton.setStyle({ color: '#55ff99', backgroundColor: '#081c15' }); });
+    playButton.on('pointerdown', () => { this.scene.start('GameScene'); });
 
     const creditButton = this.add.text(centerX, centerY + 220, 'Credits', {
       fontSize: '16px',
@@ -52,8 +61,12 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
 
-    creditButton.on('pointerover', () => {creditButton.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });});
-    creditButton.on('pointerout', () => {creditButton.setStyle({ color: '#aaaaaa', backgroundColor: '#1f1f1f' });});
-    creditButton.on('pointerdown', () => {this.scene.start('CreditsScene');});
+    creditButton.on('pointerover', () => {
+      creditButton.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });
+      // Soundeffekt abspielen
+      this.sound.play('hover-button-sound', { volume: 0.3 });
+    });
+    creditButton.on('pointerout', () => { creditButton.setStyle({ color: '#aaaaaa', backgroundColor: '#1f1f1f' }); });
+    creditButton.on('pointerdown', () => { this.scene.start('CreditsScene'); });
   }
 }
