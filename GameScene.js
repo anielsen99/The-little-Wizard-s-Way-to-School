@@ -6,6 +6,7 @@ export class GameScene extends Phaser.Scene {
     super({ key: 'GameScene' });
   }
 
+  // ============================================================================================
   preload() {
     // Assets laden
 
@@ -46,6 +47,7 @@ export class GameScene extends Phaser.Scene {
     ]);
   };
 
+  // ============================================================================================
   create() {
     // Level Höhe und Breite
     const levelWidth = 3840;
@@ -71,7 +73,9 @@ export class GameScene extends Phaser.Scene {
     // 4. Kollision für alle Kacheln aktivieren, die nicht leer sind
     groundLayer.setCollisionByExclusion([-1]);
 
-    // Wizard
+    // ---------------------------------------------
+    // WIZARD
+    // ---------------------------------------------
     // 1. Figur erstellen (nutzt standardmäßig Frame 0)
     this.wizard = this.physics.add.sprite(100, 450, 'wizard');
     this.wizard.setBounce(0.1);
@@ -88,7 +92,9 @@ export class GameScene extends Phaser.Scene {
       repeat: -1        // -1 bedeutet: Die Animation wiederholt sich endlos
     });
 
-    // Slime-enemy
+    // ---------------------------------------------
+    // SLIME-ENEMY
+    // ---------------------------------------------
     // 1. Animation definieren (Frames 0, 1, 2)
     this.anims.create({
       key: 'enemy_walk',
@@ -116,9 +122,7 @@ export class GameScene extends Phaser.Scene {
     // Kollision mit Boden & Plattformen aktivieren
     this.physics.add.collider(this.enemies, groundLayer);
 
-    // ----------------------------
     // Unsichtbare Gegner-Wände (enemy-barrier)
-    // ----------------------------
     this.enemyBarriers = this.physics.add.staticGroup();
 
     const barrierLayer = map.getObjectLayer('enemy-barrier');
@@ -144,8 +148,9 @@ export class GameScene extends Phaser.Scene {
     // Berührung mit Zauberer führt zum Tod
     this.physics.add.overlap(this.wizard, this.enemies, this.die, null, this);
 
-    //----------------------------
-    // Items
+    // ---------------------------------------------
+    // ITEMS
+    // ---------------------------------------------
     // Eine STATISCHE Physik-Gruppe für alle Items erstellen
     this.items = this.physics.add.staticGroup();
 
@@ -170,11 +175,15 @@ export class GameScene extends Phaser.Scene {
       'herbs': 2
     };
 
-    // Schloss
+    // ---------------------------------------------
+    // SCHLOSS
+    // ---------------------------------------------
     this.castle = this.physics.add.staticImage(3800, 440, 'castle-closed');
     this.physics.add.overlap(this.wizard, this.castle, this.win, null, this);
 
+    // ---------------------------------------------
     // HUD & Overlay initialisieren
+    // ---------------------------------------------
     this.hud = new HUD(this);
     this.hud.create(this.quotas);
     this.overlay = new Overlay(this)
@@ -182,11 +191,15 @@ export class GameScene extends Phaser.Scene {
     // Overlap-Prüfung aktivieren
     this.physics.add.overlap(this.wizard, this.items, this.collectItem, null, this);
 
-    // Kamera konfigurieren
+    // ---------------------------------------------
+    // KAMERA
+    // ---------------------------------------------
     this.cameras.main.setBounds(0, 0, levelWidth, levelHeight); // Kamera darf nicht über das Level hinausfilmen
     this.cameras.main.startFollow(this.wizard, true, 0.08, 0.08); // Verfolgt den Zauberer mit sanfter Verzögerung (Lerp)
 
-    // Tastatursteuerung
+    // ---------------------------------------------
+    // TASTATURSTEUERUNG
+    // ---------------------------------------------
     this.cursors = this.input.keyboard.createCursorKeys();
     this.wasd = this.input.keyboard.addKeys({
       up: Phaser.Input.Keyboard.KeyCodes.W,
@@ -196,7 +209,9 @@ export class GameScene extends Phaser.Scene {
       space: Phaser.Input.Keyboard.KeyCodes.SPACE,
     });
 
-    // Musik implementieren
+    // ---------------------------------------------
+    // Musik
+    // ---------------------------------------------
     this.bgMusic = this.sound.add('CatAstroPhi', {
       volume: 0.3, // Lautstärke (0.0 bis 1.0)
       loop: true   // Endlosschleife
@@ -204,6 +219,7 @@ export class GameScene extends Phaser.Scene {
     this.bgMusic.play();
   }
 
+  // ============================================================================================
   update() {
     // Wenn der Zauberer bereits stirbt, Steuerung ignorieren
     if (this.isDead || this.hasWon) return;
@@ -214,8 +230,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    // In update(): Gegner-Umkehrung bei Hindernissen & Animation
-    // In update():
+    // Gegner-Umkehrung bei Hindernissen & Animation
     this.enemies.getChildren().forEach(enemy => {
       // Wand rechts berührt -> nach links umdrehen
       if (enemy.body.blocked.right || enemy.body.touching.right) {
@@ -268,8 +283,7 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-
-
+  // ============================================================================================
   // Items einsammeln
   collectItem(wizard, item) {
     const itemType = item.texture.key;
@@ -283,6 +297,7 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  // ============================================================================================
   // Spieler stirbt und Level startet neu
   die() {
     if (this.isDead) return;
@@ -305,7 +320,7 @@ export class GameScene extends Phaser.Scene {
     this.overlay.showGameOver();
   }
 
-  // Wird automatisch von Phaser aufgerufen, sobald der Zauberer das Schloss berührt
+  // ============================================================================================
   win(wizard, castle) {
     // Abbrechen, wenn das Level bereits beendet oder der Spieler tot ist
     if (this.hasWon || this.isDead) return;
