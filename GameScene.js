@@ -192,9 +192,9 @@ export class GameScene extends Phaser.Scene {
     };
     // Quoten für Level 1 festlegen
     this.quotas = {
-      'mushroom': 2,
-      'tree-resin': 2,
-      'herbs': 2
+      'mushroom': 4,
+      'tree-resin': 4,
+      'herbs': 4
     };
 
     // ---------------------------------------------
