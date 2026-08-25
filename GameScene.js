@@ -11,7 +11,7 @@ export class GameScene extends Phaser.Scene {
     // Assets laden
 
     // Hintergrund
-    this.load.image('background', 'media/background_2.jpg')
+    this.load.image('background', 'media//backgrounds/background_level-1.jpg')
 
     // Castle
     this.load.image('castle-closed', 'media/castle/castle-closed.png');
@@ -110,13 +110,12 @@ export class GameScene extends Phaser.Scene {
     const enemyLayer = map.getObjectLayer('enemies');
     if (enemyLayer) {
       enemyLayer.objects.forEach(obj => {
-        // Tiled Point Offset (-24), damit der Slime auf dem Boden steht
-        const enemy = this.enemies.create(obj.x, obj.y - 24, 'slime-enemy');
+        const enemy = this.enemies.create(obj.x, obj.y, 'slime-enemy');
         enemy.play('enemy_walk');
-        enemy.setCollideWorldBounds(true);
-        
-        // Startrichtung speichern (-1 = links, 1 = rechts)
-        enemy.setData('direction', -1);
+        enemy.setVelocityX(-80);
+        enemy.setBounce(1, 0);
+        enemy.setCollideWorldBounds(true); // Verhindert Herauslaufen aus der Welt
+        // HINWEIS: enemy.setFixedRotation() wurde entfernt!
       });
     }
 
@@ -179,7 +178,7 @@ export class GameScene extends Phaser.Scene {
     // ---------------------------------------------
     // SCHLOSS
     // ---------------------------------------------
-    this.castle = this.physics.add.staticImage(3800, 440, 'castle-closed');
+    this.castle = this.physics.add.staticImage(3800, 408, 'castle-closed');
     this.physics.add.overlap(this.wizard, this.castle, this.win, null, this);
 
     // ---------------------------------------------
@@ -231,66 +230,23 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    // Gegner-Parabel-Sprünge mit 1000ms Pause
+    // Gegner-Umkehrung bei Hindernissen & Animation
     this.enemies.getChildren().forEach(enemy => {
-      // Richtungswechsel bei Wand- oder Barrier-Kontakt
+      // Wand rechts berührt -> nach links umdrehen
       if (enemy.body.blocked.right || enemy.body.touching.right) {
-        enemy.setData('direction', -1);
-      } else if (enemy.body.blocked.left || enemy.body.touching.left) {
-        enemy.setData('direction', 1);
-      }
-
-      const dir = enemy.getData('direction');
-      const isOnGround = enemy.body.blocked.down || enemy.body.touching.down;
-
-      if (isOnGround) {
-        // Sicherstellen, dass die automatische Animation gestoppt ist
-        if (enemy.anims.isPlaying) {
-          enemy.anims.stop();
-        }
-
-        // Wenn der Gegner gerade gelandet ist und noch nicht im Warterhythmus ist
-        if (!enemy.getData('isWaiting')) {
-          enemy.setData('isWaiting', true);
-          enemy.setVelocityX(0); // Bewegung stoppen
-          
-          // PHASE 1: Kurzes Stauchen bei der Landung (Frame 1)
-          enemy.setFrame(1);
-
-          // Nach 100 ms entspannen -> stillstehen auf Frame 0
-          this.time.delayedCall(100, () => {
-            if (enemy && enemy.body && (enemy.body.blocked.down || enemy.body.touching.down)) {
-              enemy.setFrame(0);
-            }
-          });
-
-          // PHASE 2: Vorbereitung auf den nächsten Sprung bei 850 ms (Frame 1)
-          this.time.delayedCall(850, () => {
-            if (enemy && enemy.body && (enemy.body.blocked.down || enemy.body.touching.down)) {
-              enemy.setFrame(1);
-            }
-          });
-
-          // PHASE 3: Absprung nach insgesamt 1000 ms
-          this.time.delayedCall(1000, () => {
-            if (enemy && enemy.body) {
-              enemy.setVelocityY(-250);      // Sprunghöhe
-              enemy.setVelocityX(60 * dir); // Sprungweite
-              enemy.setFrame(2);             // Flug-Frame
-              enemy.setData('isWaiting', false);
-            }
-          });
-        }
-      } else {
-        // In der Luft: Stoppt Animation & setzt fest Frame 2
-        if (enemy.anims.isPlaying) {
-          enemy.anims.stop();
-        }
-        enemy.setFrame(2);
+        enemy.setVelocityX(-80);
+      } 
+      // Wand links berührt -> nach rechts umdrehen
+      else if (enemy.body.blocked.left || enemy.body.touching.left) {
+        enemy.setVelocityX(80);
       }
 
       // Blickrichtung anpassen
-      enemy.setFlipX(dir > 0);
+      if (enemy.body.velocity.x > 0) {
+        enemy.setFlipX(true);  // Schaut nach rechts
+      } else if (enemy.body.velocity.x < 0) {
+        enemy.setFlipX(false); // Schaut nach links
+      }
     });
 
     const left = this.cursors.left.isDown || this.wasd.left.isDown;
