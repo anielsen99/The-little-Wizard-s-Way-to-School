@@ -11,15 +11,15 @@ export class GameScene extends Phaser.Scene {
     // Hintergrund
     this.load.image('background', 'media/background_2.jpg')
 
-    //Castle
+    // Castle
     this.load.image('castle-closed', 'media/castle/castle-closed.png');
 
-    //Items
+    // Items
     this.load.image('mushroom', 'media/items/mushroom.png');
     this.load.image('tree-resin', 'media/items/tree-resin.png');
     this.load.image('herbs', 'media/items/herbs.png');
 
-    //Wizard
+    // Wizard
     this.load.spritesheet('wizard', 'media/wizard/spritesheet-wizard.png', {
       frameWidth: 68,
       frameHeight: 104
@@ -51,18 +51,16 @@ export class GameScene extends Phaser.Scene {
 
     // Physik-Grenzen der Spielwelt
     this.physics.world.setBounds(0, 0, levelWidth, levelHeight);
+    this.physics.world.setBoundsCollision(true, true, false, false);
 
     // Schloss platzieren
     const castle_closed = this.add.image(2330, 440, 'castle-closed');
 
-    // 1. Tilemap aus dem Cache erstellen
+    // Tilemap aus dem Cache erstellen
     const map = this.make.tilemap({ key: 'map' });
-
-    // 2. Tileset verknüpfen
-    // WICHTIG: Ersetze 'tiles' im ersten Parameter durch den genauen Namen deines Tilesets aus Tiled / der .tmj-Datei!
+    // Tileset verknüpfen
     const tileset = map.addTilesetImage('tiles', 'tiles-set');
-
-    // 3. Ebene erstellen
+    // Ebene erstellen
     const groundLayer = map.createLayer('plattforms', tileset, 0, 0);
 
     // 4. Kollision für alle Kacheln aktivieren, die nicht leer sind
@@ -72,6 +70,7 @@ export class GameScene extends Phaser.Scene {
     // 1. Figur erstellen (nutzt standardmäßig Frame 0)
     this.wizard = this.physics.add.sprite(100, 450, 'wizard');
     this.wizard.setBounce(0.1);
+    this.wizard.setCollideWorldBounds(true);
     this.physics.add.collider(this.wizard, groundLayer);
     this.isDead = false;
 
@@ -98,18 +97,6 @@ export class GameScene extends Phaser.Scene {
         this.items.create(obj.x, obj.y, obj.name);
       });
     }
-
-    /*
-    // 2. Items frei im Level verteilen (X, Y, Bild-Key)
-    this.items.create(300, 640, 'mushroom');
-    this.items.create(550, 440, 'mushroom'); // Steht auf der 1. Plattform
-
-    this.items.create(980, 270, 'tree-resin'); // Steht auf der 2. Plattform
-    this.items.create(1200, 500, 'tree-resin');
-
-    this.items.create(1380, 370, 'herbs');      // Steht auf der 3. Plattform
-    this.items.create(1750, 200, 'herbs');      // Hoch in der Luft über Plattform 4
-    */
 
     // 3. Zähler-Objekt für dein Inventar
     this.inventory = {
@@ -156,7 +143,6 @@ export class GameScene extends Phaser.Scene {
     this.bgMusic.play();
   }
 
-  // ERSETZE DEINE update() METHODE DURCH DIESE:
   update() {
     // Wenn der Zauberer bereits stirbt, Steuerung ignorieren
     if (this.isDead) return;
