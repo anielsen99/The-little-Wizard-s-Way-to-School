@@ -110,12 +110,13 @@ export class GameScene extends Phaser.Scene {
     const enemyLayer = map.getObjectLayer('enemies');
     if (enemyLayer) {
       enemyLayer.objects.forEach(obj => {
-        const enemy = this.enemies.create(obj.x, obj.y, 'slime-enemy');
+        // Tiled Point Offset (-24), damit der Slime auf dem Boden steht
+        const enemy = this.enemies.create(obj.x, obj.y - 24, 'slime-enemy');
         enemy.play('enemy_walk');
-        enemy.setVelocityX(-80);
-        enemy.setBounce(1, 0);
-        enemy.setCollideWorldBounds(true); // Verhindert Herauslaufen aus der Welt
-        // HINWEIS: enemy.setFixedRotation() wurde entfernt!
+        enemy.setCollideWorldBounds(true);
+        
+        // Startrichtung speichern (-1 = links, 1 = rechts)
+        enemy.setData('direction', -1);
       });
     }
 
@@ -230,24 +231,68 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    // Gegner-Umkehrung bei Hindernissen & Animation
+    // Gegner-Parabel-Sprünge mit 1000ms Pause
     this.enemies.getChildren().forEach(enemy => {
-      // Wand rechts berührt -> nach links umdrehen
+      // Richtungswechsel bei Wand- oder Barrier-Kontakt
       if (enemy.body.blocked.right || enemy.body.touching.right) {
-        enemy.setVelocityX(-80);
-      } 
-      // Wand links berührt -> nach rechts umdrehen
-      else if (enemy.body.blocked.left || enemy.body.touching.left) {
-        enemy.setVelocityX(80);
+        enemy.setData('direction', -1);
+      } else if (enemy.body.blocked.left || enemy.body.touching.left) {
+        enemy.setData('direction', 1);
+      }
+
+      const dir = enemy.getData('direction');
+      const isOnGround = enemy.body.blocked.down || enemy.body.touching.down;
+
+      if (isOnGround) {
+        // Sicherstellen, dass die automatische Animation gestoppt ist
+        if (enemy.anims.isPlaying) {
+          enemy.anims.stop();
+        }
+
+        // Wenn der Gegner gerade gelandet ist und noch nicht im Warterhythmus ist
+        if (!enemy.getData('isWaiting')) {
+          enemy.setData('isWaiting', true);
+          enemy.setVelocityX(0); // Bewegung stoppen
+          
+          // PHASE 1: Kurzes Stauchen bei der Landung (Frame 1)
+          enemy.setFrame(1);
+
+          // Nach 100 ms entspannen -> stillstehen auf Frame 0
+          this.time.delayedCall(100, () => {
+            if (enemy && enemy.body && (enemy.body.blocked.down || enemy.body.touching.down)) {
+              enemy.setFrame(0);
+            }
+          });
+
+          // PHASE 2: Vorbereitung auf den nächsten Sprung bei 850 ms (Frame 1)
+          this.time.delayedCall(850, () => {
+            if (enemy && enemy.body && (enemy.body.blocked.down || enemy.body.touching.down)) {
+              enemy.setFrame(1);
+            }
+          });
+
+          // PHASE 3: Absprung nach insgesamt 1000 ms
+          this.time.delayedCall(1000, () => {
+            if (enemy && enemy.body) {
+              enemy.setVelocityY(-250);      // Sprunghöhe
+              enemy.setVelocityX(60 * dir); // Sprungweite
+              enemy.setFrame(2);             // Flug-Frame
+              enemy.setData('isWaiting', false);
+            }
+          });
+        }
+      } else {
+        // In der Luft: Stoppt Animation & setzt fest Frame 2
+        if (enemy.anims.isPlaying) {
+          enemy.anims.stop();
+        }
+        enemy.setFrame(2);
       }
 
       // Blickrichtung anpassen
-      if (enemy.body.velocity.x > 0) {
-        enemy.setFlipX(true);  // Schaut nach rechts
-      } else if (enemy.body.velocity.x < 0) {
-        enemy.setFlipX(false); // Schaut nach links
-      }
+      enemy.setFlipX(dir > 0);
     });
+
 
     const left = this.cursors.left.isDown || this.wasd.left.isDown;
     const right = this.cursors.right.isDown || this.wasd.right.isDown;
