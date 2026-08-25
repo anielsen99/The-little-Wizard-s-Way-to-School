@@ -399,6 +399,11 @@ export class GameScene extends Phaser.Scene {
     this.wizard.setVelocity(0, 0);
     this.wizard.setTint(0xff5555);
 
+    // Schritt-Sound stoppen
+    if (this.walkSound && this.walkSound.isPlaying) {
+      this.walkSound.stop();
+    }
+
     // Musik stoppen
     if (this.bgMusic) {
       this.bgMusic.stop();
@@ -425,6 +430,11 @@ export class GameScene extends Phaser.Scene {
       // Physik & Verfolgung stoppen
       this.physics.pause();
       this.cameras.main.stopFollow();
+
+      // Schritt-Sound stoppen
+      if (this.walkSound && this.walkSound.isPlaying) {
+        this.walkSound.stop();
+      }
 
       // Musik stoppen
       if (this.bgMusic) {
