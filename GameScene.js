@@ -53,6 +53,12 @@ export class GameScene extends Phaser.Scene {
     //Sound beim Einsammeln von Items
     this.load.audio('item-sound', 'audio/Inventory_Open_00.mp3');
 
+    // Sound beim Sterben
+    this.load.audio('dying-sound', 'audio/Jingle_Lose_00.mp3');
+
+    // Sound beim Gewinnen
+    this.load.audio('winning-sound', 'audio/Jingle_Achievement_00.mp3');
+
 
   };
 
@@ -411,6 +417,9 @@ export class GameScene extends Phaser.Scene {
 
     // Overlay anzeigen
     this.overlay.showGameOver();
+
+    // Musik Dying starten
+    this.sound.play('dying-sound', { volume: 0.3 }); // volume optional (0.0 bis 1.0)
   }
 
   // ============================================================================================
@@ -443,6 +452,10 @@ export class GameScene extends Phaser.Scene {
 
       // Win-Overlay anzeigen
       this.overlay.showWin();
+
+      // Musik Winning starten
+      this.sound.play('winning-sound', { volume: 0.3 }); // volume optional (0.0 bis 1.0)
+      
     }
   }
 }
