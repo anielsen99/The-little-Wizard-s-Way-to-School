@@ -71,9 +71,9 @@ export class GameScene extends Phaser.Scene {
     // Wizard
     // 1. Figur erstellen (nutzt standardmäßig Frame 0)
     this.wizard = this.physics.add.sprite(100, 450, 'wizard');
-    this.wizard.setCollideWorldBounds(true);
     this.wizard.setBounce(0.1);
     this.physics.add.collider(this.wizard, groundLayer);
+    this.isDead = false;
 
     // 2. Lauf-Animation anlegen
     this.anims.create({
@@ -99,6 +99,17 @@ export class GameScene extends Phaser.Scene {
       });
     }
 
+    /*
+    // 2. Items frei im Level verteilen (X, Y, Bild-Key)
+    this.items.create(300, 640, 'mushroom');
+    this.items.create(550, 440, 'mushroom'); // Steht auf der 1. Plattform
+
+    this.items.create(980, 270, 'tree-resin'); // Steht auf der 2. Plattform
+    this.items.create(1200, 500, 'tree-resin');
+
+    this.items.create(1380, 370, 'herbs');      // Steht auf der 3. Plattform
+    this.items.create(1750, 200, 'herbs');      // Hoch in der Luft über Plattform 4
+    */
 
     // 3. Zähler-Objekt für dein Inventar
     this.inventory = {
@@ -147,6 +158,15 @@ export class GameScene extends Phaser.Scene {
 
   // ERSETZE DEINE update() METHODE DURCH DIESE:
   update() {
+    // Wenn der Zauberer bereits stirbt, Steuerung ignorieren
+    if (this.isDead) return;
+
+    // Prüfen, ob der Zauberer unter den Bildschirm gefallen ist (Höhe > 720)
+    if (this.wizard.y > 750) {
+      this.die();
+      return;
+    }
+    
     const left = this.cursors.left.isDown || this.wasd.left.isDown;
     const right = this.cursors.right.isDown || this.wasd.right.isDown;
     const jump = this.cursors.up.isDown || this.wasd.up.isDown || this.wasd.space.isDown;
@@ -164,7 +184,7 @@ export class GameScene extends Phaser.Scene {
 
     // 2. Sprung (onFloor prüft sowohl Kacheln als auch Plattformen)
     if (jump && this.wizard.body.onFloor()) {
-      this.wizard.setVelocityY(-600);
+      this.wizard.setVelocityY(-450);
     }
 
     // 3. Animationen
@@ -193,6 +213,29 @@ export class GameScene extends Phaser.Scene {
 
       item.disableBody(true, true);
     }
+  }
+
+  // Spieler stirbt und Level startet neu
+  die() {
+    this.isDead = true;
+
+    // Bewegung stoppen & Figur rot einfärben
+    this.wizard.setVelocity(0, 0);
+    this.wizard.setTint(0xff5555);
+
+    // Bildschirm kurz rot aufblitzen lassen und abdunkeln
+    this.cameras.main.flash(200, 255, 0, 0);
+    this.cameras.main.fade(300, 0, 0, 0);
+
+    // Musik stoppen
+    if (this.bgMusic) {
+      this.bgMusic.stop();
+    }
+
+    // Nach dem Ausblenden die Szene komplett neu laden
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.restart();
+    });
   }
 }
 
