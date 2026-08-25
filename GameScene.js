@@ -11,10 +11,6 @@ export class GameScene extends Phaser.Scene {
     // Hintergrund
     this.load.image('background', 'media/background_2.jpg')
 
-    // Obstacles
-    this.load.image('ground', 'media/obstacles/ground.png')
-    this.load.image('plattform', 'media/obstacles/plattform.png');
-
     //Castle
     this.load.image('castle-closed', 'media/castle/castle-closed.png');
 
@@ -28,6 +24,12 @@ export class GameScene extends Phaser.Scene {
       frameWidth: 68,
       frameHeight: 104
     });
+
+    // Tiles
+    this.load.image('tiles-set', 'media/tiles.png');
+
+    // Map Level 1
+    this.load.tilemapTiledJSON('map', 'maps/level-1.tmj');
 
     // Audio laden (aus dem Phaser Labs Beispiel)
     this.load.audio('CatAstroPhi', [
@@ -53,27 +55,25 @@ export class GameScene extends Phaser.Scene {
     // Schloss platzieren
     const castle_closed = this.add.image(2330, 440, 'castle-closed');
 
-    // Plattform-Gruppe erstellen und Plattformen im Level verteilen
-    const platforms = this.physics.add.staticGroup();
+    // 1. Tilemap aus dem Cache erstellen
+    const map = this.make.tilemap({ key: 'map' });
 
-    // Durchgehender Boden über das gesamte Level
-    for (let x = 0; x < levelWidth; x += 204) {
-      platforms.create(x + 100, 688, 'ground').setScale(1).refreshBody();
-    }
+    // 2. Tileset verknüpfen
+    // WICHTIG: Ersetze 'tiles' im ersten Parameter durch den genauen Namen deines Tilesets aus Tiled / der .tmj-Datei!
+    const tileset = map.addTilesetImage('tiles', 'tiles-set');
 
-    // Schwebende Plattformen auf verschiedenen Höhen
-    platforms.create(500, 500, 'plattform');
-    platforms.create(950, 420, 'plattform');
-    platforms.create(1350, 520, 'plattform');
-    platforms.create(1700, 360, 'plattform');
-    platforms.create(2100, 480, 'plattform');
+    // 3. Ebene erstellen
+    const groundLayer = map.createLayer('plattforms', tileset, 0, 0);
+
+    // 4. Kollision für alle Kacheln aktivieren, die nicht leer sind
+    groundLayer.setCollisionByExclusion([-1]);
 
     // Wizard
     // 1. Figur erstellen (nutzt standardmäßig Frame 0)
     this.wizard = this.physics.add.sprite(100, 450, 'wizard');
     this.wizard.setCollideWorldBounds(true);
     this.wizard.setBounce(0.1);
-    this.physics.add.collider(this.wizard, platforms);
+    this.physics.add.collider(this.wizard, groundLayer);
 
     // 2. Lauf-Animation anlegen
     this.anims.create({
@@ -90,6 +90,16 @@ export class GameScene extends Phaser.Scene {
     // 1. Eine STATISCHE Physik-Gruppe für alle Items erstellen
     this.items = this.physics.add.staticGroup();
 
+    // Liest alle Punkte aus der Tiled-Objektebene namens 'Items' aus
+    const itemLayer = map.getObjectLayer('items');
+    if (itemLayer) {
+      itemLayer.objects.forEach(obj => {
+        // Erstellt das Item an den Koordinaten aus Tiled mit der Textur obj.name ('mushroom', 'tree-resin', 'herbs')
+        this.items.create(obj.x, obj.y, obj.name);
+      });
+    }
+
+    /*
     // 2. Items frei im Level verteilen (X, Y, Bild-Key)
     this.items.create(300, 640, 'mushroom');
     this.items.create(550, 440, 'mushroom'); // Steht auf der 1. Plattform
@@ -99,6 +109,7 @@ export class GameScene extends Phaser.Scene {
 
     this.items.create(1380, 370, 'herbs');      // Steht auf der 3. Plattform
     this.items.create(1750, 200, 'herbs');      // Hoch in der Luft über Plattform 4
+    */
 
     // 3. Zähler-Objekt für dein Inventar
     this.inventory = {
@@ -145,6 +156,7 @@ export class GameScene extends Phaser.Scene {
     this.bgMusic.play();
   }
 
+  // ERSETZE DEINE update() METHODE DURCH DIESE:
   update() {
     const left = this.cursors.left.isDown || this.wasd.left.isDown;
     const right = this.cursors.right.isDown || this.wasd.right.isDown;
@@ -161,23 +173,21 @@ export class GameScene extends Phaser.Scene {
       this.wizard.setVelocityX(0);
     }
 
-    // 2. Sprung-Impuls auslösen (nur wenn Bodenberührung besteht)
-    if (jump && this.wizard.body.touching.down) {
+    // 2. Sprung (onFloor prüft sowohl Kacheln als auch Plattformen)
+    if (jump && this.wizard.body.onFloor()) {
       this.wizard.setVelocityY(-450);
     }
 
-    // 3. Grafische Zuweisung: Luft zustand vs. Bodenzustand
-    if (!this.wizard.body.touching.down) {
-      // FIGURE IST IN DER LUFT:
-      this.wizard.anims.stop(); // Lauf-Animation pausieren/stoppen
-      this.wizard.setFrame(1);  // Frame 1 als Sprung-Bild erzwingen
+    // 3. Animationen
+    if (!this.wizard.body.onFloor()) {
+      this.wizard.anims.stop();
+      this.wizard.setFrame(1);
     } else {
-      // FIGURE IST AUF DEM BODEN:
       if (left || right) {
-        this.wizard.anims.play('walk', true); // Laufen abspielen
+        this.wizard.anims.play('walk', true);
       } else {
         this.wizard.anims.stop();
-        this.wizard.setFrame(0);             // Standbild (Frame 0)
+        this.wizard.setFrame(0);
       }
     }
   }
