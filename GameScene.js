@@ -101,34 +101,27 @@ export class GameScene extends Phaser.Scene {
     this.enemies = this.physics.add.group();
 
     // 2. Objektebene aus der Tiled-Map abrufen ('enemies' = Name der Objektebene in Tiled)
-    const enemyObjects = map.getObjectLayer('enemies').objects;
+    const enemyLayer = map.getObjectLayer('enemies');
+    if (enemyLayer) {
+      enemyLayer.objects.forEach(obj => {
+        const enemy = this.enemies.create(obj.x, obj.y, 'slime-enemy');
+        enemy.play('enemy_walk');
+        enemy.setVelocityX(-80);
+        enemy.setBounce(1, 0);
+        enemy.setCollideWorldBounds(true); // Verhindert Herauslaufen aus der Welt
+        // HINWEIS: enemy.setFixedRotation() wurde entfernt!
+      });
+    }
 
-    enemyObjects.forEach(obj => {
-      // Sprite an der Position des Tiled-Objekts erstellen
-      const enemy = this.enemies.create(obj.x, obj.y, 'slime-enemy');
-
-      // Animation starten
-      enemy.play('enemy_walk');
-
-      // Startgeschwindigkeit nach links setzen
-      enemy.setVelocityX(-80);
-
-      // Macht, dass der Gegner bei Kollision physikalisch abprallt
-      enemy.setBounce(1, 0);
-
-      // Verhindert, dass der Gegner bei Kollisionen rotiert
-      enemy.setFixedRotation();
-    });
-
-    // 'tiles' ist dein Plattform-Layer aus Tiled mit setCollisionByProperty()
+    // Kollision mit Boden & Plattformen aktivieren
     this.physics.add.collider(this.enemies, groundLayer);
 
-    
+    // Berührung mit Zauberer führt zum Tod
+    this.physics.add.overlap(this.wizard, this.enemies, this.die, null, this);
 
-    // ----------------------------
+    //----------------------------
     // Items
-    // ----------------------------
-    // 1. Eine STATISCHE Physik-Gruppe für alle Items erstellen
+    // Eine STATISCHE Physik-Gruppe für alle Items erstellen
     this.items = this.physics.add.staticGroup();
 
     // Liest alle Punkte aus der Tiled-Objektebene namens 'Items' aus
