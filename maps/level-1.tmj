@@ -290,6 +290,19 @@
                  "width":0,
                  "x":885.145592611199,
                  "y":573.666769718283
+                }, 
+                {
+                 "height":0,
+                 "id":35,
+                 "name":"enemy-slime",
+                 "opacity":1,
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":2135.7315598549,
+                 "y":592.503022974607
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -321,7 +334,7 @@
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":35,
+ "nextobjectid":37,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",
