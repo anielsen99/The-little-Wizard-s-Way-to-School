@@ -1,5 +1,6 @@
 import { GameScene } from './GameScene.js';
 import { MenuScene } from './MenuScene.js';
+import { CreditsScene } from './CreditsScene.js';
 
 // Konfiguration
 const config = {
