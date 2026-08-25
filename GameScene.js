@@ -47,7 +47,13 @@ export class GameScene extends Phaser.Scene {
       'https://labs.phaser.io/assets/audio/CatAstroPhi_shmup_normal.mp3'
     ]);
 
-    
+    //Sound beim Gehen
+    this.load.audio('step-sound', 'audio/Footsteps/Footstep_Dirt_07.mp3');
+
+    //Sound beim Einsammeln von Items
+    this.load.audio('item-sound', 'audio/Inventory_Open_00.mp3');
+
+
   };
 
   // ============================================================================================
@@ -79,20 +85,26 @@ export class GameScene extends Phaser.Scene {
     // ---------------------------------------------
     // WIZARD
     // ---------------------------------------------
-    // 1. Figur erstellen (nutzt standardmäßig Frame 0)
+    // Figur erstellen (nutzt standardmäßig Frame 0)
     this.wizard = this.physics.add.sprite(100, 450, 'wizard');
     this.wizard.setBounce(0.1);
     this.wizard.setCollideWorldBounds(true);
     this.physics.add.collider(this.wizard, groundLayer);
     this.isDead = false;
 
-    // 2. Lauf-Animation anlegen
+    // Lauf-Animation anlegen
     this.anims.create({
       key: 'walk',
       // Frame-Reihenfolge definieren: 0, 1, 0, 2
       frames: this.anims.generateFrameNumbers('wizard', { frames: [0, 1, 0, 2] }),
       frameRate: 8,     // Wie schnell die Bilder wechseln (8 Bilder pro Sekunde)
       repeat: -1        // -1 bedeutet: Die Animation wiederholt sich endlos
+    });
+
+    // Sound beim Laufen
+    this.walkSound = this.sound.add('step-sound', {
+      volume: 0.9, // Lautstärke anpassen
+      loop: true
     });
 
     // ---------------------------------------------
@@ -216,11 +228,13 @@ export class GameScene extends Phaser.Scene {
     // ---------------------------------------------
     // Musik
     // ---------------------------------------------
+
     this.bgMusic = this.sound.add('CatAstroPhi', {
-      volume: 0.3, // Lautstärke (0.0 bis 1.0)
+      volume: 0.1, // Lautstärke (0.0 bis 1.0)
       loop: true   // Endlosschleife
     });
     this.bgMusic.play();
+
   }
 
   // ============================================================================================
@@ -233,6 +247,10 @@ export class GameScene extends Phaser.Scene {
       this.die();
       return;
     }
+
+    // -----------------------------------------
+    // GEGNER
+    // -----------------------------------------
 
     // Gegner-Parabel-Sprünge mit 1000ms Pause
     this.enemies.getChildren().forEach(enemy => {
@@ -297,6 +315,10 @@ export class GameScene extends Phaser.Scene {
     });
 
 
+    // -----------------------------
+    // WIZARD
+    // -----------------------------
+
     const left = this.cursors.left.isDown || this.wasd.left.isDown;
     const right = this.cursors.right.isDown || this.wasd.right.isDown;
     const jump = this.cursors.up.isDown || this.wasd.up.isDown || this.wasd.space.isDown;
@@ -317,16 +339,31 @@ export class GameScene extends Phaser.Scene {
       this.wizard.setVelocityY(-600);
     }
 
-    // Animationen
+    // Animationen & Sound
     if (!this.wizard.body.onFloor()) {
+      // In der Luft (Springen/Fallen): Animation stoppen & Sound anhalten
       this.wizard.anims.stop();
       this.wizard.setFrame(1);
+
+      if (this.walkSound.isPlaying) {
+        this.walkSound.stop();
+      }
     } else {
       if (left || right) {
+        // Am Boden & in Bewegung: Animation spielen & Sound starten (falls er noch nicht läuft)
         this.wizard.anims.play('walk', true);
+
+        if (!this.walkSound.isPlaying) {
+          this.walkSound.play();
+        }
       } else {
+        // Am Boden & Stillstand: Animation stoppen & Sound anhalten
         this.wizard.anims.stop();
         this.wizard.setFrame(0);
+
+        if (this.walkSound.isPlaying) {
+          this.walkSound.stop();
+        }
       }
     }
   }
@@ -342,6 +379,9 @@ export class GameScene extends Phaser.Scene {
       // HUD-Zähler aktualisieren
       this.hud.updateCounter(itemType, this.inventory[itemType]);
       item.disableBody(true, true);
+
+      // Soundeffekt abspielen
+      this.sound.play('item-sound', { volume: 0.5 }); // volume optional (0.0 bis 1.0)
     }
   }
 
