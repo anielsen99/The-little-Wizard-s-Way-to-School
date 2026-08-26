@@ -75,6 +75,9 @@ export class GameScene extends Phaser.Scene {
     //Sound beim Gehen
     this.load.audio('step-sound', 'audio/Footsteps/Footstep_Dirt_07.mp3');
 
+    //Sound beim Springen Wizard
+    this.load.audio('jump-sound', 'audio/jump.wav');
+
     //Sound beim Einsammeln von Items
     this.load.audio('item-sound', 'audio/Inventory_Open_00.mp3');
 
@@ -107,7 +110,7 @@ export class GameScene extends Phaser.Scene {
         quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
         castleX: 3800,
         castleY: 408,
-        endTexture: 'tent' 
+        endTexture: 'tent'
       },
       2: {
         width: 4800,
@@ -117,7 +120,7 @@ export class GameScene extends Phaser.Scene {
         quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
         castleX: 4760,
         castleY: 408,
-        endTexture: 'castle-closed' 
+        endTexture: 'castle-closed'
       }
     };
     const currentConfig = levelSettings[this.currentLevel] || levelSettings[1];
@@ -306,8 +309,8 @@ export class GameScene extends Phaser.Scene {
     // SCHLOSS
     // ---------------------------------------------
     this.castle = this.physics.add.staticImage(
-      currentConfig.castleX, 
-      currentConfig.castleY, 
+      currentConfig.castleX,
+      currentConfig.castleY,
       currentConfig.endTexture
     );
 
@@ -469,6 +472,7 @@ export class GameScene extends Phaser.Scene {
     // Sprung (onFloor prüft sowohl Kacheln als auch Plattformen)
     if (jump && this.wizard.body.onFloor()) {
       this.wizard.setVelocityY(-600);
+      this.sound.play('jump-sound', { volume: 0.3 });
     }
 
     // Animationen & Sound
