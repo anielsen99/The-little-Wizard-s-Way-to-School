@@ -87,6 +87,9 @@ export class GameScene extends Phaser.Scene {
     // Sound beim Gewinnen
     this.load.audio('winning-sound', 'audio/Jingle_Achievement_00.mp3');
 
+    // Sound bei Sprechblase
+    this.load.audio('speechbubble-sound', 'audio/huh.MP3');
+
     // Sound der Spells
     this.load.audio('spell-sound', 'audio/Spell_00.mp3');
 
@@ -631,7 +634,7 @@ export class GameScene extends Phaser.Scene {
 
       // Sprechblasen-Text zusammenbauen
       const missingText = missing.join(', ');
-      const message = `Oh nein, da habe ich doch gleich\n${missingText}\nvergessen. Die brauch ich für den\nZaubertrankunterricht!`;
+      const message = `Oh nein, da habe ich doch gleich\n${missingText}\nvergessen. Die brauch' ich für den\nZaubertrankunterricht!`;
 
       this.showSpeechBubble(message);
     }
@@ -696,6 +699,8 @@ export class GameScene extends Phaser.Scene {
     // Verhindert, dass die Sprechblase mehrfach gleichzeitig erzeugt wird
     if (this.isTalking) return;
     this.isTalking = true;
+
+    this.sound.play('speechbubble-sound', { volume: 0.7 });
 
     const bubbleWidth = 320;
     const bubbleHeight = 85;
