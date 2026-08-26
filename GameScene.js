@@ -372,7 +372,7 @@ export class GameScene extends Phaser.Scene {
     if (this.isDead || this.hasWon) return;
 
     if (this.currentBubble) {
-      this.currentBubble.setPosition(this.wizard.x, this.wizard.y - 95);
+      this.currentBubble.setPosition(this.wizard.x, this.wizard.y - 170);
     }
 
     // Prüfen, ob der Zauberer unter den Bildschirm gefallen ist (Höhe > 720)
@@ -634,7 +634,7 @@ export class GameScene extends Phaser.Scene {
 
       // Sprechblasen-Text zusammenbauen
       const missingText = missing.join(', ');
-      const message = `Oh nein, da habe ich doch gleich\n${missingText}\nvergessen. Die brauch' ich für den\nZaubertrankunterricht!`;
+      const message = `Oh nein, da habe ich doch\ngleich ${missingText} vergessen.\nDie brauch' ich für den\nZaubertrankunterricht!`;
 
       this.showSpeechBubble(message);
     }
@@ -703,10 +703,10 @@ export class GameScene extends Phaser.Scene {
     this.sound.play('speechbubble-sound', { volume: 0.7 });
 
     const bubbleWidth = 320;
-    const bubbleHeight = 85;
+    const bubbleHeight = 170;
 
     // Container erstellen, der alle Teile der Sprechblase bündelt
-    this.currentBubble = this.add.container(this.wizard.x, this.wizard.y - 95);
+    this.currentBubble = this.add.container(this.wizard.x, this.wizard.y - 170);
     this.currentBubble.setDepth(150);
 
     // 1. Weißer Kasten mit abgerundeten Ecken
@@ -727,7 +727,7 @@ export class GameScene extends Phaser.Scene {
 
     // 3. Text in der Blase
     const bubbleText = this.add.text(0, 0, text, {
-      fontSize: '13px',
+      fontSize: '16px',
       fontFamily: 'monospace',
       fontStyle: 'bold',
       color: '#1a1a1a',
