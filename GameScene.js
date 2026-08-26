@@ -330,13 +330,15 @@ export class GameScene extends Phaser.Scene {
     // Musik
     // ---------------------------------------------
 
-    
+
 
     // Welcher Key soll je nach Level genutzt werden?
     const musicKey = this.currentLevel === 2 ? 'level-2-sound' : 'level-1-sound';
+    // Welche Lautstärke soll genutzt werden? (Level 1 leiser, Level 2 lauter)
+    const musicVolume = this.currentLevel === 2 ? 0.45 : 0.1;
 
     this.bgMusic = this.sound.add(musicKey, {
-      volume: 0.1,
+      volume: musicVolume,
       loop: true
     });
     this.bgMusic.play();
