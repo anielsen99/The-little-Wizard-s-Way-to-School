@@ -248,6 +248,10 @@ export class GameScene extends Phaser.Scene {
     // Wenn der Zauberer bereits stirbt, Steuerung ignorieren
     if (this.isDead || this.hasWon) return;
 
+    if (this.currentBubble) {
+      this.currentBubble.setPosition(this.wizard.x, this.wizard.y - 95);
+    }
+
     // Prüfen, ob der Zauberer unter den Bildschirm gefallen ist (Höhe > 720)
     if (this.wizard.y > 750) {
       this.die();
@@ -455,8 +459,80 @@ export class GameScene extends Phaser.Scene {
 
       // Musik Winning starten
       this.sound.play('winning-sound', { volume: 0.3 }); // volume optional (0.0 bis 1.0)
-      
     }
+    else {
+      // Fehlende Items berechnen
+      const missing = [];
+      const itemNames = {
+        'mushroom': 'Pilz(e)',
+        'tree-resin': 'Baumharz',
+        'herbs': 'Kräuter'
+      };
+
+      for (const [key, quota] of Object.entries(this.quotas)) {
+        const diff = quota - this.inventory[key];
+        if (diff > 0) {
+          missing.push(`${diff}x ${itemNames[key] || key}`);
+        }
+      }
+
+      // Sprechblasen-Text zusammenbauen
+      const missingText = missing.join(', ');
+      const message = `Oh nein, da habe ich doch gleich\n${missingText}\nvergessen. Die brauch ich für den\nZaubertrankunterricht!`;
+
+      this.showSpeechBubble(message);
+    }
+  }
+
+  // Zeigt eine Sprechblase über dem Zauberer an
+  showSpeechBubble(text) {
+    // Verhindert, dass die Sprechblase mehrfach gleichzeitig erzeugt wird
+    if (this.isTalking) return;
+    this.isTalking = true;
+
+    const bubbleWidth = 320;
+    const bubbleHeight = 85;
+
+    // Container erstellen, der alle Teile der Sprechblase bündelt
+    this.currentBubble = this.add.container(this.wizard.x, this.wizard.y - 95);
+    this.currentBubble.setDepth(150);
+
+    // 1. Weißer Kasten mit abgerundeten Ecken
+    const bg = this.add.graphics();
+    bg.fillStyle(0xffffff, 0.95);
+    bg.fillRoundedRect(-bubbleWidth / 2, -bubbleHeight / 2, bubbleWidth, bubbleHeight, 8);
+    bg.lineStyle(2, 0x333333, 1);
+    bg.strokeRoundedRect(-bubbleWidth / 2, -bubbleHeight / 2, bubbleWidth, bubbleHeight, 8);
+
+    // 2. Kleine Sprechblasen-Spitze nach unten zum Zauberer
+    bg.fillStyle(0xffffff, 0.95);
+    bg.beginPath();
+    bg.moveTo(-8, bubbleHeight / 2);
+    bg.lineTo(0, bubbleHeight / 2 + 10);
+    bg.lineTo(8, bubbleHeight / 2);
+    bg.closePath();
+    bg.fillPath();
+
+    // 3. Text in der Blase
+    const bubbleText = this.add.text(0, 0, text, {
+      fontSize: '13px',
+      fontFamily: 'monospace',
+      fontStyle: 'bold',
+      color: '#1a1a1a',
+      align: 'center',
+      wordWrap: { width: bubbleWidth - 20 }
+    }).setOrigin(0.5);
+
+    this.currentBubble.add([bg, bubbleText]);
+
+    // Nach 3.5 Sekunden wird die Sprechblase wieder ausgeblendet
+    this.time.delayedCall(3500, () => {
+      if (this.currentBubble) {
+        this.currentBubble.destroy();
+        this.currentBubble = null;
+      }
+      this.isTalking = false; // Kann danach erneut ausgelöst werden
+    });
   }
 }
 
