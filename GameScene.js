@@ -27,6 +27,9 @@ export class GameScene extends Phaser.Scene {
       frameHeight: 104
     });
 
+    // Spell
+    this.load.image('spell', 'media/wizard/spell.png');
+
     // Slime-enemy
     // Pass deine Frame-Maße an (frameWidth / frameHeight)
     this.load.spritesheet('slime-enemy', 'media/enemies/spritesheet-slime.png', {
@@ -78,6 +81,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, levelWidth, levelHeight);
     this.physics.world.setBoundsCollision(true, true, false, false);
 
+
     // Tilemap aus dem Cache erstellen
     const map = this.make.tilemap({ key: 'map' });
     // Tileset verknüpfen
@@ -87,6 +91,7 @@ export class GameScene extends Phaser.Scene {
 
     // 4. Kollision für alle Kacheln aktivieren, die nicht leer sind
     groundLayer.setCollisionByExclusion([-1]);
+
 
     // ---------------------------------------------
     // WIZARD
@@ -114,22 +119,7 @@ export class GameScene extends Phaser.Scene {
     });
 
 
-    // ---------------------------------------------
-    // ZAUBERSPRÜCHE (PROJECTILES)
-    // ---------------------------------------------
-    // Physikalische Gruppe für die Geschosse
-    this.spells = this.physics.add.group({
-      defaultKey: 'mushroom', // Oder ein beliebiges Sprite/Texture-Key für den Zauber
-      maxSize: 10             // Maximal 10 Geschosse gleichzeitig auf dem Bildschirm
-    });
-
-    // Kollision: Geschoss trifft Gegner -> beide verletzen/zerstören
-    this.physics.add.overlap(this.spells, this.enemies, this.hitEnemy, null, this);
-
-    // Tastatur-Event für die Leertaste (Einzelschuss beim Drücken)
-    this.input.keyboard.on('keydown-SPACE', () => {
-      this.castSpell();
-    });
+    
 
 
     // ---------------------------------------------
@@ -187,7 +177,25 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.enemies, this.enemyBarriers);
 
     // Berührung mit Zauberer führt zum Tod
-    this.physics.add.overlap(this.wizard, this.enemies, this.die, null, this);
+    this.physics.add.collider(this.wizard, this.enemies, this.die, null, this);
+
+    // ---------------------------------------------
+    // ZAUBERSPRÜCHE (PROJECTILES)
+    // ---------------------------------------------
+    this.spells = this.physics.add.group({
+      allowGravity: false // Alle Zauber fliegen ab sofort geradeaus
+    });
+
+    // 1. Kollision: Zauber trifft Wand -> hitWall wird ausgeführt
+    this.physics.add.collider(this.spells, groundLayer, this.hitWall, null, this);
+
+    // 2. Kollision: Zauber trifft Gegner -> hitEnemy wird ausgeführt
+    this.physics.add.overlap(this.spells, this.enemies, this.hitEnemy, null, this);
+
+    // Tastatur-Event für die Leertaste (Einzelschuss beim Drücken)
+    this.input.keyboard.on('keydown-SPACE', () => {
+      this.castSpell();
+    });
 
     // ---------------------------------------------
     // ITEMS
@@ -508,57 +516,41 @@ export class GameScene extends Phaser.Scene {
   // ============================================================================================
   // Zauberspruch abfeuern
   castSpell() {
-
-    // Nicht dauerhaft zaubern
-    if (this.spellCooldown) return;
-
-    this.spellCooldown = true;
-    this.time.delayedCall(300, () => { this.spellCooldown = false; }); // 300ms Cooldown
-
     if (this.isDead || this.hasWon) return;
 
-    // Blickrichtung des Zauberers ermitteln (flipX = true bedeutet nach links)
+    // Blickrichtung ermitteln
     const isFacingLeft = this.wizard.flipX;
     const spawnX = isFacingLeft ? this.wizard.x - 30 : this.wizard.x + 30;
     const spawnY = this.wizard.y - 10;
     const speed = isFacingLeft ? -400 : 400;
 
-    // Geschoss aus der Gruppe abrufen/erstellen
-    const spell = this.spells.get(spawnX, spawnY);
+    // Einen komplett neuen Zauber erstellen
+    const spell = this.spells.create(spawnX, spawnY, 'spell');
 
-    if (spell) {
-      spell.setActive(true);
-      spell.setVisible(true);
+    spell.setVelocityX(speed);
+    spell.setVelocityY(0);
+    spell.setFlipX(isFacingLeft);
 
-      // Physik-Körper aktivieren & Schwerkraft für den Zauber ausschalten
-      spell.body.enable = true;
-      spell.body.allowGravity = false;
-      spell.setVelocityX(speed);
-      spell.setVelocityY(0);
-      
+    // Nach 2 Sekunden restlos aus dem Speicher löschen (verhindert Geister-Löschungen)
+    this.time.delayedCall(2000, () => {
+      if (spell && spell.active) {
+        spell.destroy();
+      }
+    });
+  }
 
-      // Grafik drehen, falls sie nach links fliegt
-      spell.setFlipX(isFacingLeft);
-
-      // Geschoss nach 2 Sekunden (oder wenn außerhalb des Bildschirms) wieder entfernen
-      this.time.delayedCall(2000, () => {
-        if (spell.active) {
-          this.spells.killAndHide(spell);
-          spell.body.enable = false;
-        }
-      });
-    }
+  // ============================================================================================
+  // Treffer-Logik: Zauberspruch trifft auf Wand oder Boden
+  hitWall(spell, wall) {
+    spell.destroy(); // Zauber sofort und komplett löschen
   }
 
   // ============================================================================================
   // Treffer-Logik zwischen Zauberspruch und Gegner
   hitEnemy(spell, enemy) {
-    // Geschoss deaktivieren
-    this.spells.killAndHide(spell);
-    spell.body.enable = false;
-
-    // Gegner deaktivieren/zerstören
-    enemy.destroy();
+    console.log("GEGNER GETROFFEN!");
+    spell.destroy(); // Zauber komplett löschen
+    enemy.destroy(); // Gegner zerstören
   }
 
   // Zeigt eine Sprechblase über dem Zauberer an
