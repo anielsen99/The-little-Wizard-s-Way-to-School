@@ -30,6 +30,8 @@ export class MenuScene extends Phaser.Scene {
       fontStyle: 'bold'
     }).setOrigin(0.5);
 
+    // ----------------------------
+    // Play
     const playButton = this.add.text(centerX, centerY + 40, '▶ SPIEL STARTEN', {
       fontSize: '24px',
       color: '#55ff99',
@@ -48,6 +50,28 @@ export class MenuScene extends Phaser.Scene {
     playButton.on('pointerout', () => { playButton.setStyle({ color: '#55ff99', backgroundColor: '#081c15' }); });
     playButton.on('pointerdown', () => { this.scene.start('GameScene'); });
 
+    // ----------------------------
+    // Settings
+    const settingsButton = this.add.text(centerX, centerY + 100, 'SETTINGS', {
+      fontSize: '24px',
+      color: '#aaaaaa',
+      fontFamily: 'monospace',
+      backgroundColor: '#1f1f1f',
+      padding: { x: 70, y: 10 }
+    })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+
+    settingsButton.on('pointerover', () => {
+      settingsButton.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });
+      // Soundeffekt abspielen
+      this.sound.play('hover-button-sound', { volume: 0.3 });
+    });
+    settingsButton.on('pointerout', () => { settingsButton.setStyle({ color: '#aaaaaa', backgroundColor: '#1f1f1f' }); });
+    settingsButton.on('pointerdown', () => { this.scene.start('GameScene'); });
+
+    // ----------------------------
+    // Credits
     const creditButton = this.add.text(centerX, centerY + 220, 'Credits', {
       fontSize: '16px',
       fontFamily: 'monospace',
