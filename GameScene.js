@@ -39,7 +39,8 @@ export class GameScene extends Phaser.Scene {
       frameHeight: 48
     });
 
-    //this.load.image('spell', 'media/wizard/spell.png');
+    // HUD Background
+    this.load.image('HUD-bg', 'media/HUD-bg.png');
 
     // Slime-enemy
     // Pass deine Frame-Maße an (frameWidth / frameHeight)
