@@ -35,8 +35,8 @@ export class GameScene extends Phaser.Scene {
 
     // Spell
     this.load.spritesheet('spell_anim', 'media/wizard/spritesheet-spell.png', {
-      frameWidth: 48,  
-      frameHeight: 48 
+      frameWidth: 48,
+      frameHeight: 48
     });
 
     //this.load.image('spell', 'media/wizard/spell.png');
@@ -228,13 +228,13 @@ export class GameScene extends Phaser.Scene {
 
     this.anims.create({
       key: 'spell_fly', // Der Name der Animation, den wir später benutzen
-      frames: this.anims.generateFrameNumbers('spell_anim', { 
-          start: 0, // Erster Frame
-          end: 1    // Letzter Frame (bei 2 Frames ist das Index 1)
+      frames: this.anims.generateFrameNumbers('spell_anim', {
+        start: 0, // Erster Frame
+        end: 1    // Letzter Frame (bei 2 Frames ist das Index 1)
       }),
       frameRate: 10, // Geschwindigkeit (Bilder pro Sekunde)
       repeat: -1     // Unendlich wiederholen
-  });
+    });
 
     // ---------------------------------------------
     // ITEMS
@@ -506,6 +506,13 @@ export class GameScene extends Phaser.Scene {
       this.physics.pause();
       this.cameras.main.stopFollow();
 
+      // Bewegung stoppen 
+      this.wizard.setVelocity(0, 0);
+
+      // Lauf-Animation stoppen & auf Steh-Frame zurücksetzen (NEU!)
+      this.wizard.anims.stop();
+      this.wizard.setFrame(0);
+
       // Schritt-Sound stoppen
       if (this.walkSound && this.walkSound.isPlaying) {
         this.walkSound.stop();
@@ -550,7 +557,7 @@ export class GameScene extends Phaser.Scene {
   // Zauberspruch abfeuern
   // In castSpell():
 
-castSpell() {
+  castSpell() {
     if (this.isDead || this.hasWon) return;
 
     this.sound.play('spell-sound', { volume: 0.5 });
@@ -578,7 +585,7 @@ castSpell() {
         spell.destroy();
       }
     });
-}
+  }
   // ============================================================================================
   // Treffer-Logik: Zauberspruch trifft auf Wand oder Boden
   hitWall(spell, wall) {
