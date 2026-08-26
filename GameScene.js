@@ -442,20 +442,22 @@ export class GameScene extends Phaser.Scene {
   }
 
   // ============================================================================================
-  // Items einsammeln
+  // ============================================================================================
+  // Items einsammeln (ohne Limit)
   collectItem(wizard, item) {
     const itemType = item.texture.key;
 
-    if (this.inventory[itemType] < this.quotas[itemType]) {
-      this.inventory[itemType] += 1;
+    // 1. Zähler immer erhöhen
+    this.inventory[itemType] += 1;
 
-      // HUD-Zähler aktualisieren
-      this.hud.updateCounter(itemType, this.inventory[itemType]);
-      item.disableBody(true, true);
+    // 2. HUD-Zähler aktualisieren (übergibt Typ, aktuellen Stand & Ziel-Quote)
+    this.hud.updateCounter(itemType, this.inventory[itemType], this.quotas[itemType]);
 
-      // Soundeffekt abspielen
-      this.sound.play('item-sound', { volume: 0.5 }); // volume optional (0.0 bis 1.0)
-    }
+    // 3. Item immer vom Spielfeld entfernen
+    item.disableBody(true, true);
+
+    // 4. Soundeffekt abspielen
+    this.sound.play('item-sound', { volume: 0.5 });
   }
 
   // ============================================================================================
