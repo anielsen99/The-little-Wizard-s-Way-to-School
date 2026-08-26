@@ -60,11 +60,14 @@ export class GameScene extends Phaser.Scene {
     this.load.tilemapTiledJSON('map-2', 'maps/level-2.tmj');
 
     // Audio laden
-    // Musik während Level
-    this.load.audio('CatAstroPhi', [
+    // Musik während Level 1
+    this.load.audio('level-1-sound', [
       'https://labs.phaser.io/assets/audio/CatAstroPhi_shmup_normal.ogg',
       'https://labs.phaser.io/assets/audio/CatAstroPhi_shmup_normal.mp3'
     ]);
+
+    // Musik während Level 2
+    this.load.audio('level-2-sound', 'audio/Opening_01.ogg');
 
     //Sound beim Gehen
     this.load.audio('step-sound', 'audio/Footsteps/Footstep_Dirt_07.mp3');
@@ -327,9 +330,14 @@ export class GameScene extends Phaser.Scene {
     // Musik
     // ---------------------------------------------
 
-    this.bgMusic = this.sound.add('CatAstroPhi', {
-      volume: 0.1, // Lautstärke (0.0 bis 1.0)
-      loop: true   // Endlosschleife
+    
+
+    // Welcher Key soll je nach Level genutzt werden?
+    const musicKey = this.currentLevel === 2 ? 'level-2-sound' : 'level-1-sound';
+
+    this.bgMusic = this.sound.add(musicKey, {
+      volume: 0.1,
+      loop: true
     });
     this.bgMusic.play();
 
