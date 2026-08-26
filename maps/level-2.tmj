@@ -238,10 +238,21 @@
                  "width":0,
                  "x":602.640137746317,
                  "y":572.029845035393
-                }, 
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":5,
+         "name":"poison",
+         "objects":[
                 {
                  "height":0,
-                 "id":69,
+                 "id":75,
                  "name":"poison-mushroom",
                  "opacity":1,
                  "point":true,
@@ -249,12 +260,12 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":928.667563930014,
-                 "y":508.449229848961
+                 "x":934.179486854061,
+                 "y":511.586436642997
                 }, 
                 {
                  "height":0,
-                 "id":70,
+                 "id":76,
                  "name":"poison-mushroom",
                  "opacity":1,
                  "point":true,
@@ -262,12 +273,12 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":2566.17317182593,
-                 "y":593.689247794228
+                 "x":2571.68148685406,
+                 "y":596.826436642997
                 }, 
                 {
                  "height":0,
-                 "id":71,
+                 "id":77,
                  "name":"poison-mushroom",
                  "opacity":1,
                  "point":true,
@@ -275,8 +286,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":4392.10408254823,
-                 "y":411.24570061313
+                 "x":4396.23889746418,
+                 "y":412.324552558171
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -343,8 +354,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":5,
- "nextobjectid":72,
+ "nextlayerid":6,
+ "nextobjectid":78,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

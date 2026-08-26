@@ -236,6 +236,43 @@
         }, 
         {
          "draworder":"topdown",
+         "id":5,
+         "name":"poison",
+         "objects":[
+                {
+                 "height":0,
+                 "id":41,
+                 "name":"poison-mushroom",
+                 "opacity":1,
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":815.793461106027,
+                 "y":113.739716433521
+                }, 
+                {
+                 "height":0,
+                 "id":42,
+                 "name":"poison-mushroom",
+                 "opacity":1,
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1967.57746110603,
+                 "y":227.480716433521
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":3,
          "name":"enemies",
          "objects":[
@@ -264,32 +301,6 @@
                  "width":0,
                  "x":2135.7315598549,
                  "y":592.503022974607
-                }, 
-                {
-                 "height":0,
-                 "id":39,
-                 "name":"poison-mushroom",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":814.485553667146,
-                 "y":113.74035821676
-                }, 
-                {
-                 "height":0,
-                 "id":40,
-                 "name":"poison-mushroom",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1966.27010066675,
-                 "y":227.480716433521
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -332,8 +343,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":5,
- "nextobjectid":41,
+ "nextlayerid":6,
+ "nextobjectid":43,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",
