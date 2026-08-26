@@ -28,7 +28,12 @@ export class GameScene extends Phaser.Scene {
     });
 
     // Spell
-    this.load.image('spell', 'media/wizard/spell.png');
+    this.load.spritesheet('spell_anim', 'media/wizard/spritesheet-spell.png', {
+      frameWidth: 48,  
+      frameHeight: 48 
+    });
+
+    //this.load.image('spell', 'media/wizard/spell.png');
 
     // Slime-enemy
     // Pass deine Frame-Maße an (frameWidth / frameHeight)
@@ -122,7 +127,7 @@ export class GameScene extends Phaser.Scene {
     });
 
 
-    
+
 
 
     // ---------------------------------------------
@@ -199,6 +204,17 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard.on('keydown-SPACE', () => {
       this.castSpell();
     });
+
+    this.anims.create({
+      key: 'spell_fly', // Der Name der Animation, den wir später benutzen
+      frames: this.anims.generateFrameNumbers('spell_anim', { 
+          start: 0, // Erster Frame
+          end: 1    // Letzter Frame (bei 2 Frames ist das Index 1)
+      }),
+      frameRate: 10, // Geschwindigkeit (Bilder pro Sekunde)
+      repeat: -1     // Unendlich wiederholen
+  });
+
 
     // ---------------------------------------------
     // ITEMS
@@ -518,33 +534,37 @@ export class GameScene extends Phaser.Scene {
 
   // ============================================================================================
   // Zauberspruch abfeuern
-  castSpell() {
+  // In castSpell():
+
+castSpell() {
     if (this.isDead || this.hasWon) return;
 
-    // Soundeffekt beim Zaubern abspielen
     this.sound.play('spell-sound', { volume: 0.5 });
 
-    // Blickrichtung ermitteln
     const isFacingLeft = this.wizard.flipX;
     const spawnX = isFacingLeft ? this.wizard.x - 30 : this.wizard.x + 30;
     const spawnY = this.wizard.y - 10;
     const speed = isFacingLeft ? -400 : 400;
 
-    // Einen komplett neuen Zauber erstellen
-    const spell = this.spells.create(spawnX, spawnY, 'spell');
+    // 1. ÄNDERUNG: Nutze hier den neuen Spritesheet-Key 'spell_anim'
+    const spell = this.spells.create(spawnX, spawnY, 'spell_anim');
+
+    // 2. ÄNDERUNG: Starte die Animation
+    spell.play('spell_fly');
+
+    spell.body.setSize(spell.width, spell.height);
+    spell.body.allowGravity = false;
 
     spell.setVelocityX(speed);
     spell.setVelocityY(0);
     spell.setFlipX(isFacingLeft);
 
-    // Nach 2 Sekunden restlos aus dem Speicher löschen (verhindert Geister-Löschungen)
     this.time.delayedCall(2000, () => {
       if (spell && spell.active) {
         spell.destroy();
       }
     });
-  }
-
+}
   // ============================================================================================
   // Treffer-Logik: Zauberspruch trifft auf Wand oder Boden
   hitWall(spell, wall) {
