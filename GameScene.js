@@ -389,7 +389,7 @@ export class GameScene extends Phaser.Scene {
       }
 
       const dir = enemy.getData('direction');
-      const isOnGround = enemy.body.blocked.down || enemy.body.touching.down && enemy.body.velocity.y >= 0;
+      const isOnGround = (enemy.body.blocked.down || enemy.body.touching.down) && enemy.body.velocity.y >= 0;
 
       if (isOnGround) {
         // Sicherstellen, dass die automatische Animation gestoppt ist
