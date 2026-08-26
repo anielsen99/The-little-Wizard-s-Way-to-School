@@ -68,7 +68,7 @@ export class MenuScene extends Phaser.Scene {
       this.sound.play('hover-button-sound', { volume: 0.3 });
     });
     settingsButton.on('pointerout', () => { settingsButton.setStyle({ color: '#aaaaaa', backgroundColor: '#1f1f1f' }); });
-    settingsButton.on('pointerdown', () => { this.scene.start('GameScene'); });
+    settingsButton.on('pointerdown', () => { this.scene.start('SettingsScene'); });
 
     // ----------------------------
     // Credits
