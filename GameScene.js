@@ -260,6 +260,30 @@ export class GameScene extends Phaser.Scene {
     };
 
     // ---------------------------------------------
+    // TÖDLICHE ITEMS
+    // ---------------------------------------------
+    // 1. Statische Physik-Gruppe für tödliche Objekte erstellen
+    this.hazards = this.physics.add.staticGroup();
+
+    // 2. Layer aus Tiled abrufen
+    const hazardLayer = map.getObjectLayer('poison');
+
+    if (hazardLayer) {
+      hazardLayer.objects.forEach(obj => {
+        // Erstelle ein Physik-Objekt an den Tiled-Koordinaten
+        const hazard = this.hazards.create(obj.x, obj.y, 'poison-mushroom');
+
+        // Hitbox anpassen, falls nötig
+        hazard.refreshBody();
+      });
+    }
+
+    // 3. Overlap-Prüfung zwischen Zauberer und den Gefahren-Objekten
+    this.physics.add.overlap(this.wizard, this.hazards, this.hitHazard, null, this);
+
+
+
+    // ---------------------------------------------
     // SCHLOSS
     // ---------------------------------------------
     this.castle = this.physics.add.staticImage(currentConfig.castleX, currentConfig.castleY, 'castle-closed');
@@ -459,6 +483,20 @@ export class GameScene extends Phaser.Scene {
 
     // 4. Soundeffekt abspielen
     this.sound.play('item-sound', { volume: 0.5 });
+  }
+
+  // ============================================================================================
+  // Tödliche Items einsammeln
+  // ============================================================================================
+  // Treffer-Logik für tödliche Items
+  hitHazard(wizard, hazard) {
+    if (this.isDead || this.hasWon) return;
+
+    // Optional: Das tödliche Item sofort ausblenden
+    hazard.disableBody(true, true);
+
+    // Ruft deine fertige Todes-Funktion auf (kümmert sich um Overlay, Sound & Stopps)
+    this.die();
   }
 
   // ============================================================================================
