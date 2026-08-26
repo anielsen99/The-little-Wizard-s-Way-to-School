@@ -474,6 +474,10 @@ export class GameScene extends Phaser.Scene {
     this.wizard.setVelocity(0, 0);
     this.wizard.setTint(0xff5555);
 
+    // Lauf-Animation stoppen & auf Steh-Frame zurücksetzen (NEU!)
+    this.wizard.anims.stop();
+    this.wizard.setFrame(0);
+
     // Schritt-Sound stoppen
     if (this.walkSound && this.walkSound.isPlaying) {
       this.walkSound.stop();
