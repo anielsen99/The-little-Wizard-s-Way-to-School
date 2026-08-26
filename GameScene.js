@@ -93,7 +93,6 @@ export class GameScene extends Phaser.Scene {
     // Sound jumping Enemy
     this.load.audio('slime-jump-sound', 'audio/slime_step_1.ogg');
 
-    slime-jump-sound
   };
 
   // ============================================================================================
@@ -167,7 +166,7 @@ export class GameScene extends Phaser.Scene {
 
     // Sound beim Laufen
     this.walkSound = this.sound.add('step-sound', {
-      volume: 0.9, // Lautstärke anpassen
+      volume: 0.7, // Lautstärke anpassen
       loop: true
     });
 
@@ -423,7 +422,7 @@ export class GameScene extends Phaser.Scene {
 
               // NEU: Nur abspielen, wenn der Gegner im sichtbaren Bereich der Kamera ist
               if (this.cameras.main.worldView.contains(enemy.x, enemy.y)) {
-                this.sound.play('slime-jump-sound', { volume: 0.2 }); // Lautstärke nach Bedarf anpassen
+                this.sound.play('slime-jump-sound', { volume: 0.4 }); // Lautstärke nach Bedarf anpassen
               }
             }
           });
@@ -634,7 +633,7 @@ export class GameScene extends Phaser.Scene {
   castSpell() {
     if (this.isDead || this.hasWon) return;
 
-    this.sound.play('spell-sound', { volume: 0.5 });
+    this.sound.play('spell-sound', { volume: 0.2 });
 
     const isFacingLeft = this.wizard.flipX;
     const spawnX = isFacingLeft ? this.wizard.x - 30 : this.wizard.x + 30;
