@@ -62,6 +62,9 @@ export class GameScene extends Phaser.Scene {
     // Sound beim Gewinnen
     this.load.audio('winning-sound', 'audio/Jingle_Achievement_00.mp3');
 
+    // Sound der Spells
+    this.load.audio('spell-sound', 'audio/Spell_00.mp3');
+
 
   };
 
@@ -517,6 +520,9 @@ export class GameScene extends Phaser.Scene {
   // Zauberspruch abfeuern
   castSpell() {
     if (this.isDead || this.hasWon) return;
+
+    // Soundeffekt beim Zaubern abspielen
+    this.sound.play('spell-sound', { volume: 0.5 });
 
     // Blickrichtung ermitteln
     const isFacingLeft = this.wizard.flipX;
