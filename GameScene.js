@@ -90,7 +90,10 @@ export class GameScene extends Phaser.Scene {
     // Sound Dying Enemy
     this.load.audio('enemy-death-sound', 'audio/flyswatter.wav');
 
+    // Sound jumping Enemy
+    this.load.audio('slime-jump-sound', 'audio/slime_step_1.ogg');
 
+    slime-jump-sound
   };
 
   // ============================================================================================
@@ -412,13 +415,16 @@ export class GameScene extends Phaser.Scene {
 
           // PHASE 3: Absprung nach insgesamt 1000 ms
           this.time.delayedCall(1000, () => {
-            if (enemy && enemy.body) {
+            if (enemy && enemy.active && enemy.body) {
               enemy.setVelocityY(-250);      // Sprunghöhe
               enemy.setVelocityX(60 * dir); // Sprungweite
               enemy.setFrame(2);             // Flug-Frame
-              enemy.body.blocked.down = false;
-              enemy.body.touching.down = false;
               enemy.setData('isWaiting', false);
+
+              // NEU: Nur abspielen, wenn der Gegner im sichtbaren Bereich der Kamera ist
+              if (this.cameras.main.worldView.contains(enemy.x, enemy.y)) {
+                this.sound.play('slime-jump-sound', { volume: 0.2 }); // Lautstärke nach Bedarf anpassen
+              }
             }
           });
         }
