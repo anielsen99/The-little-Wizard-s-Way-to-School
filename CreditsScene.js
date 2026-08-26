@@ -5,10 +5,10 @@ export class CreditsScene extends Phaser.Scene {
 
   preload() {
     // Hintergrundbild laden
-    this.load.image('bg-menu', 'media/backgrounds/background_menu.jpg')
+    this.load.image('bg-menu', 'media/backgrounds/background_menu.jpg');
 
-    // Soundeffect laden
-    this.load.audio('hover-button-sound', 'audio/Pickup_Gold_00.mp3')
+    // Soundeffekt laden
+    this.load.audio('hover-button-sound', 'audio/Pickup_Gold_00.mp3');
   }
 
   create() {
@@ -23,67 +23,82 @@ export class CreditsScene extends Phaser.Scene {
       .setTint(0x444444);
 
     // 2. Transparente Infobox
-    const boxWidth = 600;
-    const boxHeight = 440;
+    const boxWidth = 720;
+    const boxHeight = 560;
+    const boxY = height / 2;
+
     const box = this.add.graphics();
-    box.fillStyle(0x0a0a0a, 0.85);
-    box.fillRect(centerX - boxWidth / 2, height / 2 - boxHeight / 2, boxWidth, boxHeight, 12);
+    box.fillStyle(0x0a0a0a, 0.88);
+    box.fillRect(centerX - boxWidth / 2, boxY - boxHeight / 2, boxWidth, boxHeight, 12);
     box.lineStyle(2, 0xffd700, 0.8);
-    box.strokeRect(centerX - boxWidth / 2, height / 2 - boxHeight / 2, boxWidth, boxHeight, 12);
+    box.strokeRect(centerX - boxWidth / 2, boxY - boxHeight / 2, boxWidth, boxHeight, 12);
 
     // 3. Titel
-    this.add.text(centerX, 180, 'CREDITS', {
-      fontSize: '28px',
+    this.add.text(centerX, 115, 'CREDITS', {
+      fontSize: '26px',
       fontFamily: 'monospace',
       fontStyle: 'bold',
       color: '#ffd700'
     }).setOrigin(0.5);
 
     // 4. Spiel & Grafik
-    this.add.text(centerX, 240, 'SPIEL & GRAFIK', {
-      fontSize: '18px',
+    this.add.text(centerX, 160, 'SPIEL & GRAFIK', {
+      fontSize: '16px',
       fontFamily: 'monospace',
       fontStyle: 'bold',
       color: '#55ff99'
     }).setOrigin(0.5);
 
-    this.add.text(centerX, 270, 'Stefanie Kottmann & Amanda Nielsen', {
-      fontSize: '16px',
+    this.add.text(centerX, 185, 'Stefanie Kottmann & Amanda Nielsen', {
+      fontSize: '15px',
       fontFamily: 'monospace',
       color: '#ffffff'
     }).setOrigin(0.5);
 
     // 5. Sound & Musik
-    this.add.text(centerX, 330, 'AUDIO & SOUNDEFFEKTE', {
-      fontSize: '18px',
+    this.add.text(centerX, 230, 'AUDIO & SOUNDEFFEKTE', {
+      fontSize: '16px',
       fontFamily: 'monospace',
       fontStyle: 'bold',
       color: '#55ff99'
     }).setOrigin(0.5);
 
-    this.add.text(centerX, 360, 'Little Robot Sound Factory', {
-      fontSize: '16px',
+    // -- Little Robot Sound Factory
+    this.add.text(centerX, 260, 'Little Robot Sound Factory', {
+      fontSize: '14px',
       fontFamily: 'monospace',
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    // Anklickbarer Weblink
-    const linkText = this.add.text(centerX, 385, 'www.littlerobotsoundfactory.com', {
+    this.createLink(centerX, 280, 'www.littlerobotsoundfactory.com', 'http://www.littlerobotsoundfactory.com');
+
+    // -- AVGVSTA
+    this.add.text(centerX, 310, 'Sounds & Music by AVGVSTA', {
       fontSize: '14px',
       fontFamily: 'monospace',
-      color: '#66b3ff'
-    })
-    .setOrigin(0.5)
-    .setInteractive({ useHandCursor: true });
+      color: '#ffffff'
+    }).setOrigin(0.5);
 
-    linkText.on('pointerover', () => linkText.setStyle({ color: '#ffffff' }));
-    linkText.on('pointerout', () => linkText.setStyle({ color: '#66b3ff' }));
-    linkText.on('pointerdown', () => {
-      window.open('http://www.littlerobotsoundfactory.com', '_blank');
-    });
+    // -- Marcelo Fernandez
+    this.add.text(centerX, 345, '“Pixel adventures” – Music by Marcelo Fernandez', {
+      fontSize: '14px',
+      fontFamily: 'monospace',
+      color: '#ffffff'
+    }).setOrigin(0.5);
+
+    this.createLink(centerX, 368, 'www.marcelofernandezmusic.com (CC BY 4.0)', 'http://www.marcelofernandezmusic.com');
+
+    // -- Flush (OpenGameArt)
+    this.add.text(centerX, 405, 'Additional Sounds by Flush', {
+      fontSize: '14px',
+      fontFamily: 'monospace',
+      color: '#ffffff'
+    }).setOrigin(0.5);
+
+    this.createLink(centerX, 428, 'opengameart.org/users/flush', 'https://opengameart.org/users/flush');
 
     // 6. Zurück-Button
-    const backBtn = this.add.text(centerX, 470, '⬅ Zurück zum Menü', {
+    const backBtn = this.add.text(centerX, 505, '⬅ Zurück zum Menü', {
       fontSize: '16px',
       fontFamily: 'monospace',
       fontStyle: 'bold',
@@ -96,14 +111,31 @@ export class CreditsScene extends Phaser.Scene {
 
     backBtn.on('pointerover', () => {
       backBtn.setStyle({ backgroundColor: '#3a3a3a' });
-      // Soundeffekt abspielen
       this.sound.play('hover-button-sound', { volume: 0.3 });
     });
-
 
     backBtn.on('pointerout', () => backBtn.setStyle({ backgroundColor: '#1f1f1f' }));
     backBtn.on('pointerdown', () => {
       this.scene.start('MenuScene');
     });
+  }
+
+  // Hilfsfunktion zum Erstellen interaktiver Links
+  createLink(x, y, displayText, url) {
+    const link = this.add.text(x, y, displayText, {
+      fontSize: '13px',
+      fontFamily: 'monospace',
+      color: '#66b3ff'
+    })
+    .setOrigin(0.5)
+    .setInteractive({ useHandCursor: true });
+
+    link.on('pointerover', () => link.setStyle({ color: '#ffffff' }));
+    link.on('pointerout', () => link.setStyle({ color: '#66b3ff' }));
+    link.on('pointerdown', () => {
+      window.open(url, '_blank');
+    });
+
+    return link;
   }
 }
