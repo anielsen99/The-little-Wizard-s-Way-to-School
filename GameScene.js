@@ -113,6 +113,25 @@ export class GameScene extends Phaser.Scene {
       loop: true
     });
 
+
+    // ---------------------------------------------
+    // ZAUBERSPRÜCHE (PROJECTILES)
+    // ---------------------------------------------
+    // Physikalische Gruppe für die Geschosse
+    this.spells = this.physics.add.group({
+      defaultKey: 'mushroom', // Oder ein beliebiges Sprite/Texture-Key für den Zauber
+      maxSize: 10             // Maximal 10 Geschosse gleichzeitig auf dem Bildschirm
+    });
+
+    // Kollision: Geschoss trifft Gegner -> beide verletzen/zerstören
+    this.physics.add.overlap(this.spells, this.enemies, this.hitEnemy, null, this);
+
+    // Tastatur-Event für die Leertaste (Einzelschuss beim Drücken)
+    this.input.keyboard.on('keydown-SPACE', () => {
+      this.castSpell();
+    });
+
+
     // ---------------------------------------------
     // SLIME-ENEMY
     // ---------------------------------------------
@@ -331,7 +350,7 @@ export class GameScene extends Phaser.Scene {
 
     const left = this.cursors.left.isDown || this.wasd.left.isDown;
     const right = this.cursors.right.isDown || this.wasd.right.isDown;
-    const jump = this.cursors.up.isDown || this.wasd.up.isDown || this.wasd.space.isDown;
+    const jump = this.cursors.up.isDown || this.wasd.up.isDown || this.wasd.isDown;
 
     // Horizontale Bewegung & Richtung
     if (right) {
@@ -484,6 +503,62 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  // ============================================================================================
+  // Zauberspruch abfeuern
+  castSpell() {
+
+    // Nicht dauerhaft zaubern
+    if (this.spellCooldown) return;
+
+    this.spellCooldown = true;
+    this.time.delayedCall(300, () => { this.spellCooldown = false; }); // 300ms Cooldown
+
+    if (this.isDead || this.hasWon) return;
+
+    // Blickrichtung des Zauberers ermitteln (flipX = true bedeutet nach links)
+    const isFacingLeft = this.wizard.flipX;
+    const spawnX = isFacingLeft ? this.wizard.x - 30 : this.wizard.x + 30;
+    const spawnY = this.wizard.y - 10;
+    const speed = isFacingLeft ? -400 : 400;
+
+    // Geschoss aus der Gruppe abrufen/erstellen
+    const spell = this.spells.get(spawnX, spawnY);
+
+    if (spell) {
+      spell.setActive(true);
+      spell.setVisible(true);
+
+      // Physik-Körper aktivieren & Schwerkraft für den Zauber ausschalten
+      spell.body.enable = true;
+      spell.body.allowGravity = false;
+      spell.setVelocityX(speed);
+      spell.setVelocityY(0);
+      
+
+      // Grafik drehen, falls sie nach links fliegt
+      spell.setFlipX(isFacingLeft);
+
+      // Geschoss nach 2 Sekunden (oder wenn außerhalb des Bildschirms) wieder entfernen
+      this.time.delayedCall(2000, () => {
+        if (spell.active) {
+          this.spells.killAndHide(spell);
+          spell.body.enable = false;
+        }
+      });
+    }
+  }
+
+  // ============================================================================================
+  // Treffer-Logik zwischen Zauberspruch und Gegner
+  hitEnemy(spell, enemy) {
+    // Geschoss deaktivieren
+    this.spells.killAndHide(spell);
+    spell.body.enable = false;
+
+    // Gegner deaktivieren/zerstören
+    enemy.destroy();
+  }
+
   // Zeigt eine Sprechblase über dem Zauberer an
   showSpeechBubble(text) {
     // Verhindert, dass die Sprechblase mehrfach gleichzeitig erzeugt wird
@@ -535,4 +610,6 @@ export class GameScene extends Phaser.Scene {
     });
   }
 }
+
+
 
