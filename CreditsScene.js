@@ -5,10 +5,10 @@ export class CreditsScene extends Phaser.Scene {
 
   preload() {
     // Hintergrundbild laden
-    this.load.image('bg-menu', 'media//backgrounds/background_menu.jpg')
+    this.load.image('bg-menu', 'media/backgrounds/background_menu.jpg')
 
     // Soundeffect laden
-    this.load.audio('hover-button-sound', '/audio/Pickup_Gold_00.mp3')
+    this.load.audio('hover-button-sound', 'audio/Pickup_Gold_00.mp3')
   }
 
   create() {

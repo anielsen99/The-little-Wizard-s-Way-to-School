@@ -8,7 +8,7 @@ export class MenuScene extends Phaser.Scene {
     this.load.image('bg-menu', 'media/backgrounds/background_menu.jpg')
 
     // Soundeffect laden
-    this.load.audio('hover-button-sound', '/audio/Pickup_Gold_00.mp3')
+    this.load.audio('hover-button-sound', 'audio/Pickup_Gold_00.mp3')
 
 
   }

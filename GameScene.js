@@ -11,7 +11,7 @@ export class GameScene extends Phaser.Scene {
     // Assets laden
 
     // Hintergrund
-    this.load.image('bg-game', 'media//backgrounds/background_level-1.jpg')
+    this.load.image('bg-game', 'media/backgrounds/background_level-1.jpg')
 
     // Castle
     this.load.image('castle-closed', 'media/castle/castle-closed.png');
