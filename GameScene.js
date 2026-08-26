@@ -16,8 +16,9 @@ export class GameScene extends Phaser.Scene {
   preload() {
     // Assets laden
 
-    // Hintergrund
-    this.load.image('bg-game', 'media/backgrounds/background_level-1.jpg')
+    // Hintergründe
+    this.load.image('bg-level-1', 'media/backgrounds/background_level-1.jpg');
+    this.load.image('bg-level-2', 'media/backgrounds/background_level-2.jpg');
 
     // Castle
     this.load.image('castle-closed', 'media/castle/castle-closed.png');
@@ -89,6 +90,7 @@ export class GameScene extends Phaser.Scene {
       1: {
         width: 3840,
         height: 720,
+        bg: 'bg-level-1',
         quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
         castleX: 3800,
         castleY: 408
@@ -96,6 +98,7 @@ export class GameScene extends Phaser.Scene {
       2: {
         width: 4800,
         height: 720,
+        bg: 'bg-level-2',
         quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
         castleX: 4760,
         castleY: 408
@@ -107,7 +110,7 @@ export class GameScene extends Phaser.Scene {
     this.quotas = currentConfig.quotas;
 
     // Hintergrund
-    const bg = this.add.image(0, 0, 'bg-game')
+    const bg = this.add.image(0, 0, currentConfig.bg)
       .setOrigin(0, 0)
       .setDisplaySize(1280, 720)   // Passt das Bild an die Bildschirmgröße an
       .setScrollFactor(0);         // 0 = fixiert am Bildschirm (scrollt nicht weg)
