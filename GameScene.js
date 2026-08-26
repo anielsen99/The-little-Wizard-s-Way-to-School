@@ -23,6 +23,9 @@ export class GameScene extends Phaser.Scene {
     // Castle
     this.load.image('castle-closed', 'media/castle/castle-closed.png');
 
+    // Tent
+    this.load.image('tent', 'media/castle/tent.png');
+
     // Items
     this.load.image('mushroom', 'media/items/mushroom.png');
     this.load.image('tree-resin', 'media/items/tree-resin.png');
