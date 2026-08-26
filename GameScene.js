@@ -87,6 +87,9 @@ export class GameScene extends Phaser.Scene {
     // Sound der Spells
     this.load.audio('spell-sound', 'audio/Spell_00.mp3');
 
+    // Sound Dying Enemy
+    this.load.audio('enemy-death-sound', 'audio/flyswatter.wav');
+
 
   };
 
@@ -660,9 +663,16 @@ export class GameScene extends Phaser.Scene {
   // ============================================================================================
   // Treffer-Logik zwischen Zauberspruch und Gegner
   hitEnemy(spell, enemy) {
-    console.log("GEGNER GETROFFEN!");
-    spell.destroy(); // Zauber komplett löschen
-    enemy.destroy(); // Gegner zerstören
+    if (spell && spell.active) {
+      spell.destroy(); // Zauber löschen
+    }
+
+    if (enemy && enemy.active) {
+      // 1. Soundeffekt abspielen
+      this.sound.play('enemy-death-sound', { volume: 0.7 });
+      // 2. Gegner aus der Spielwelt entfernen
+      enemy.destroy();
+    }
   }
 
   // Zeigt eine Sprechblase über dem Zauberer an
