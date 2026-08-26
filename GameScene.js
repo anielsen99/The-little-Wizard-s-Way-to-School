@@ -106,7 +106,8 @@ export class GameScene extends Phaser.Scene {
         tiles: 'tiles-1',
         quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
         castleX: 3800,
-        castleY: 408
+        castleY: 408,
+        endTexture: 'tent' 
       },
       2: {
         width: 4800,
@@ -115,7 +116,8 @@ export class GameScene extends Phaser.Scene {
         tiles: 'tiles-2',
         quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
         castleX: 4760,
-        castleY: 408
+        castleY: 408,
+        endTexture: 'castle-closed' 
       }
     };
     const currentConfig = levelSettings[this.currentLevel] || levelSettings[1];
@@ -303,7 +305,12 @@ export class GameScene extends Phaser.Scene {
     // ---------------------------------------------
     // SCHLOSS
     // ---------------------------------------------
-    this.castle = this.physics.add.staticImage(currentConfig.castleX, currentConfig.castleY, 'castle-closed');
+    this.castle = this.physics.add.staticImage(
+      currentConfig.castleX, 
+      currentConfig.castleY, 
+      currentConfig.endTexture
+    );
+
     this.physics.add.overlap(this.wizard, this.castle, this.win, null, this);
 
     // ---------------------------------------------
