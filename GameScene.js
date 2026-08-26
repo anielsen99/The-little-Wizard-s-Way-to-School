@@ -291,7 +291,7 @@ export class GameScene extends Phaser.Scene {
       }
 
       const dir = enemy.getData('direction');
-      const isOnGround = enemy.body.blocked.down || enemy.body.touching.down;
+      const isOnGround = enemy.body.blocked.down || enemy.body.touching.down && enemy.body.velocity.y >= 0;
 
       if (isOnGround) {
         // Sicherstellen, dass die automatische Animation gestoppt ist
@@ -327,6 +327,8 @@ export class GameScene extends Phaser.Scene {
               enemy.setVelocityY(-250);      // Sprunghöhe
               enemy.setVelocityX(60 * dir); // Sprungweite
               enemy.setFrame(2);             // Flug-Frame
+              enemy.body.blocked.down = false;
+              enemy.body.touching.down = false;
               enemy.setData('isWaiting', false);
             }
           });
