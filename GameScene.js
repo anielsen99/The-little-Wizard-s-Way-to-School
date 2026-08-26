@@ -52,7 +52,8 @@ export class GameScene extends Phaser.Scene {
     this.load.image('poison-mushroom', 'media/enemies/poison-mushroom.png');
 
     // Tiles
-    this.load.image('tiles-set', 'media/tiles.png');
+    this.load.image('tiles-set-1', 'maps/tiles/tiles-1.png');
+    this.load.image('tiles-set-2', 'maps/tiles/tiles-2.png');
 
     // Map Level
     this.load.tilemapTiledJSON('map-1', 'maps/level-1.tmj');
@@ -91,6 +92,7 @@ export class GameScene extends Phaser.Scene {
         width: 3840,
         height: 720,
         bg: 'bg-level-1',
+        tiles: 'tiles-1',
         quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
         castleX: 3800,
         castleY: 408
@@ -99,6 +101,7 @@ export class GameScene extends Phaser.Scene {
         width: 4800,
         height: 720,
         bg: 'bg-level-2',
+        tiles: 'tiles-2',
         quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
         castleX: 4760,
         castleY: 408
@@ -123,7 +126,7 @@ export class GameScene extends Phaser.Scene {
     // Tilemap aus dem Cache erstellen
     const map = this.make.tilemap({ key: `map-${this.currentLevel}` });
     // Tileset verknüpfen
-    const tileset = map.addTilesetImage('tiles', 'tiles-set');
+    const tileset = map.addTilesetImage(currentConfig.tiles, `tiles-set-${this.currentLevel}`);
     // Ebene erstellen
     const groundLayer = map.createLayer('plattforms', tileset, 0, 0);
 
