@@ -139,19 +139,6 @@
                 }, 
                 {
                  "height":0,
-                 "id":9,
-                 "name":"herbs",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1966.37168141593,
-                 "y":403.53982300885
-                }, 
-                {
-                 "height":0,
                  "id":10,
                  "name":"herbs",
                  "opacity":1,
@@ -204,19 +191,6 @@
                 }, 
                 {
                  "height":0,
-                 "id":14,
-                 "name":"tree-resin",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":1941.59292035398,
-                 "y":284.955752212389
-                }, 
-                {
-                 "height":0,
                  "id":15,
                  "name":"tree-resin",
                  "opacity":1,
@@ -240,19 +214,6 @@
                  "width":0,
                  "x":1536.28318584071,
                  "y":553.982300884956
-                }, 
-                {
-                 "height":0,
-                 "id":17,
-                 "name":"tree-resin",
-                 "opacity":1,
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":810.619469026549,
-                 "y":118.58407079646
                 }, 
                 {
                  "height":0,
@@ -303,6 +264,32 @@
                  "width":0,
                  "x":2135.7315598549,
                  "y":592.503022974607
+                }, 
+                {
+                 "height":0,
+                 "id":39,
+                 "name":"poison-mushroom",
+                 "opacity":1,
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":814.485553667146,
+                 "y":113.74035821676
+                }, 
+                {
+                 "height":0,
+                 "id":40,
+                 "name":"poison-mushroom",
+                 "opacity":1,
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1966.27010066675,
+                 "y":227.480716433521
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -346,7 +333,7 @@
          "y":0
         }],
  "nextlayerid":5,
- "nextobjectid":38,
+ "nextobjectid":41,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.12.2",

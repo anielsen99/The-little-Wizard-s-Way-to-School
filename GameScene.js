@@ -42,12 +42,13 @@ export class GameScene extends Phaser.Scene {
     // HUD Background
     this.load.image('HUD-bg', 'media/HUD-bg.png');
 
-    // Slime-enemy
+    // Enemies
     // Pass deine Frame-Maße an (frameWidth / frameHeight)
     this.load.spritesheet('slime-enemy', 'media/enemies/spritesheet-slime.png', {
       frameWidth: 48,
       frameHeight: 48
     });
+    this.load.image('poison-mushroom', 'media/enemies/poison-mushroom.png');
 
     // Tiles
     this.load.image('tiles-set', 'media/tiles.png');
