@@ -6,6 +6,12 @@ export class GameScene extends Phaser.Scene {
     super({ key: 'GameScene' });
   }
 
+  init(data) {
+    this.currentLevel = data.level || 1;
+    this.hasWon = false;
+    this.isDead = false;
+  }
+
   // ============================================================================================
   preload() {
     // Assets laden
@@ -45,8 +51,9 @@ export class GameScene extends Phaser.Scene {
     // Tiles
     this.load.image('tiles-set', 'media/tiles.png');
 
-    // Map Level 1
-    this.load.tilemapTiledJSON('map', 'maps/level-1.tmj');
+    // Map Level
+    this.load.tilemapTiledJSON('map-1', 'maps/level-1.tmj');
+    this.load.tilemapTiledJSON('map-2', 'maps/level-2.tmj');
 
     // Audio laden
     // Musik während Level
@@ -76,8 +83,26 @@ export class GameScene extends Phaser.Scene {
   // ============================================================================================
   create() {
     // Level Höhe und Breite
-    const levelWidth = 3840;
-    const levelHeight = 720;
+    const levelSettings = {
+      1: {
+        width: 3840,
+        height: 720,
+        quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
+        castleX: 3800,
+        castleY: 408
+      },
+      2: {
+        width: 4800,
+        height: 720,
+        quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
+        castleX: 4760,
+        castleY: 408
+      }
+    };
+    const currentConfig = levelSettings[this.currentLevel] || levelSettings[1];
+    const levelWidth = currentConfig.width;
+    const levelHeight = currentConfig.height;
+    this.quotas = currentConfig.quotas;
 
     // Hintergrund
     const bg = this.add.image(0, 0, 'bg-game')
@@ -91,7 +116,7 @@ export class GameScene extends Phaser.Scene {
 
 
     // Tilemap aus dem Cache erstellen
-    const map = this.make.tilemap({ key: 'map' });
+    const map = this.make.tilemap({ key: `map-${this.currentLevel}` });
     // Tileset verknüpfen
     const tileset = map.addTilesetImage('tiles', 'tiles-set');
     // Ebene erstellen
@@ -125,10 +150,6 @@ export class GameScene extends Phaser.Scene {
       volume: 0.9, // Lautstärke anpassen
       loop: true
     });
-
-
-
-
 
     // ---------------------------------------------
     // SLIME-ENEMY
@@ -215,7 +236,6 @@ export class GameScene extends Phaser.Scene {
       repeat: -1     // Unendlich wiederholen
   });
 
-
     // ---------------------------------------------
     // ITEMS
     // ---------------------------------------------
@@ -236,17 +256,11 @@ export class GameScene extends Phaser.Scene {
       'tree-resin': 0,
       'herbs': 0
     };
-    // Quoten für Level 1 festlegen
-    this.quotas = {
-      'mushroom': 4,
-      'tree-resin': 4,
-      'herbs': 4
-    };
 
     // ---------------------------------------------
     // SCHLOSS
     // ---------------------------------------------
-    this.castle = this.physics.add.staticImage(3800, 408, 'castle-closed');
+    this.castle = this.physics.add.staticImage(currentConfig.castleX, currentConfig.castleY, 'castle-closed');
     this.physics.add.overlap(this.wizard, this.castle, this.win, null, this);
 
     // ---------------------------------------------

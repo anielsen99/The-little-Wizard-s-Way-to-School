@@ -58,7 +58,7 @@ export class Overlay {
         retryBtn.on('pointerout', () => retryBtn.setStyle({ color: '#ff6666', backgroundColor: '#3b1212' }));
         retryBtn.on('pointerdown', () => {
             if (this.scene.bgMusic) this.scene.bgMusic.stop();
-            this.scene.scene.restart();
+            this.scene.scene.restart({ level: this.scene.currentLevel || 1 });
         });
 
         // Button: Menü
@@ -90,13 +90,16 @@ export class Overlay {
         const centerX = width / 2;
         const centerY = height / 2;
 
+        const currentLevel = this.scene.currentLevel || 1;
+        const isLevel1 = currentLevel === 1;
+
         // Dunkler, halbtransparenter Hintergrund
         const backdrop = this.scene.add.graphics();
         backdrop.fillStyle(0x000000, 0.75);
         backdrop.fillRect(0, 0, width, height);
         backdrop.setScrollFactor(0).setDepth(200);
 
-        // Dialog-Kasten in der Mitte (Smaragdgrün & Goldener Rand)
+        // Dialog-Kasten in der Mitte
         const boxWidth = 460;
         const boxHeight = 240;
         const boxX = centerX - boxWidth / 2;
@@ -105,12 +108,13 @@ export class Overlay {
         const box = this.scene.add.graphics();
         box.fillStyle(0x07150d, 0.95);
         box.fillRect(boxX, boxY, boxWidth, boxHeight, 12);
-        box.lineStyle(2, 0xffd700, 0.9); // Goldener Rahmen
+        box.lineStyle(2, 0xffd700, 0.9);
         box.strokeRect(boxX, boxY, boxWidth, boxHeight, 12);
         box.setScrollFactor(0).setDepth(201);
 
-        // Titeltext
-        this.scene.add.text(centerX, boxY + 45, '★ LEVEL GESCHAFFT! ★', {
+        // Titel: Zeigt an, was geschafft wurde
+        const titleText = isLevel1 ? '★ LEVEL 1 GESCHAFFT! ★' : '★ SPIEL GEWONNEN! ★';
+        this.scene.add.text(centerX, boxY + 45, titleText, {
             fontSize: '22px',
             fontFamily: 'monospace',
             fontStyle: 'bold',
@@ -120,8 +124,10 @@ export class Overlay {
             .setScrollFactor(0)
             .setDepth(202);
 
-        // Button: Nochmal spielen
-        const replayBtn = this.scene.add.text(centerX, boxY + 115, 'Erneut spielen', {
+        // Haupt-Button: "Level 2 spielen" nach Level 1, sonst "Erneut spielen"
+        const buttonLabel = isLevel1 ? '▶ Level 2 spielen' : 'Erneut spielen';
+
+        const actionBtn = this.scene.add.text(centerX, boxY + 115, buttonLabel, {
             fontSize: '18px',
             fontFamily: 'monospace',
             fontStyle: 'bold',
@@ -134,11 +140,18 @@ export class Overlay {
             .setDepth(202)
             .setInteractive({ useHandCursor: true });
 
-        replayBtn.on('pointerover', () => replayBtn.setStyle({ color: '#ffffff', backgroundColor: '#185a32' }));
-        replayBtn.on('pointerout', () => replayBtn.setStyle({ color: '#55ff99', backgroundColor: '#0d381e' }));
-        replayBtn.on('pointerdown', () => {
+        actionBtn.on('pointerover', () => actionBtn.setStyle({ color: '#ffffff', backgroundColor: '#185a32' }));
+        actionBtn.on('pointerout', () => actionBtn.setStyle({ color: '#55ff99', backgroundColor: '#0d381e' }));
+        actionBtn.on('pointerdown', () => {
             if (this.scene.bgMusic) this.scene.bgMusic.stop();
-            this.scene.scene.restart();
+
+            if (isLevel1) {
+                // Startet GameScene direkt mit Level 2
+                this.scene.scene.restart({ level: 2 });
+            } else {
+                // Nach Level 2 wieder bei Level 1 beginnen
+                this.scene.scene.restart({ level: 1 });
+            }
         });
 
         // Button: Menü
