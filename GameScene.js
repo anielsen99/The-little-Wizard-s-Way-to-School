@@ -36,7 +36,7 @@ export class GameScene extends Phaser.Scene {
 
     // Wizard
     this.load.spritesheet('wizard', 'media/wizard/spritesheet-wizard.png', {
-      frameWidth: 68,
+      frameWidth: 120,
       frameHeight: 104
     });
 
@@ -146,6 +146,7 @@ export class GameScene extends Phaser.Scene {
     const levelHeight = currentConfig.height;
     this.quotas = currentConfig.quotas;
 
+    
     // Tasten für Zauber registrieren
     this.keyJ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
     this.keyK = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
@@ -186,6 +187,8 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.wizard, groundLayer);
     this.isDead = false;
 
+    
+
     // Lauf-Animation anlegen
     this.anims.create({
       key: 'walk',
@@ -194,6 +197,28 @@ export class GameScene extends Phaser.Scene {
       frameRate: 8,     // Wie schnell die Bilder wechseln (8 Bilder pro Sekunde)
       repeat: -1        // -1 bedeutet: Die Animation wiederholt sich endlos
     });
+
+    // 1. Besen-Flug-Animation erstellen (nutzt die neuen Frames 3 und 4)
+    this.anims.create({
+      key: 'fly_broom',
+      frames: this.anims.generateFrameNumbers('wizard', { start: 3, end: 4 }),
+      frameRate: 6,
+      repeat: -1
+    });
+
+    // 2. Gleit-Variablen
+    this.isGliding = false;
+    this.canGlide = true;      // Wird erst am Boden wieder auf true gesetzt
+    this.glideStartTime = 0;
+    this.maxGlideTime = 1500;  // Maximal 1.500 ms (1,5 Sekunden)
+
+    // 3. Maße für Hitboxen (Passe die Zahlen an deinen Sprite an!)
+    this.normalWidth = 68;     // Normaler Steh-/Lauf-Körper
+    this.normalHeight = 104;
+    this.broomWidth = 120;      // Breitere Hitbox für den Besenflug
+    this.broomHeight = 104;
+    this.setNormalHitbox();
+
 
     // Sound beim Laufen
     this.walkSound = this.sound.add('step-sound', {
@@ -497,14 +522,22 @@ export class GameScene extends Phaser.Scene {
 
 
     // -----------------------------
-    // WIZARD
+    // WIZARD STEUERUNG & BESEN
     // -----------------------------
 
     const left = this.cursors.left.isDown || this.wasd.left.isDown;
     const right = this.cursors.right.isDown || this.wasd.right.isDown;
-    const jump = this.cursors.up.isDown || this.wasd.up.isDown || this.wasd.isDown;
+    
+    // Unterscheidung: Einmaliges Drücken (Sprung) vs. Halten (Gleiten)
+    const jumpPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up) || 
+                        Phaser.Input.Keyboard.JustDown(this.wasd.up) || 
+                        Phaser.Input.Keyboard.JustDown(this.wasd.space);
+                        
+    const jumpHeld = this.cursors.up.isDown || this.wasd.up.isDown || this.wasd.space.isDown;
 
-    // Horizontale Bewegung & Richtung
+    const isOnGround = this.wizard.body.onFloor();
+
+    // 1. Horizontale Bewegung
     if (right) {
       this.wizard.setVelocityX(160);
       this.wizard.setFlipX(false);
@@ -515,39 +548,75 @@ export class GameScene extends Phaser.Scene {
       this.wizard.setVelocityX(0);
     }
 
-    // Sprung (onFloor prüft sowohl Kacheln als auch Plattformen)
-    if (jump && this.wizard.body.onFloor()) {
+    // 2. Erster Sprung vom Boden
+    if (jumpPressed && isOnGround) {
       this.wizard.setVelocityY(-600);
       this.sound.play('jump-sound', { volume: 0.3 });
     }
 
-    // Animationen & Sound
-    if (!this.wizard.body.onFloor()) {
-      // In der Luft (Springen/Fallen): Animation stoppen & Sound anhalten
-      this.wizard.anims.stop();
-      this.wizard.setFrame(1);
-
-      if (this.walkSound.isPlaying) {
-        this.walkSound.stop();
+    // 3. Besen-Gleiten Logik
+    if (isOnGround) {
+      if (this.isGliding) {
+        this.stopGliding();
       }
+      this.canGlide = true; // Wieder freigeben am Boden
     } else {
-      if (left || right) {
-        // Am Boden & in Bewegung: Animation spielen & Sound starten (falls er noch nicht läuft)
-        this.wizard.anims.play('walk', true);
+      // In der Luft: Besen aktivieren, wenn Taste gehalten wird & Figur nach unten fällt
+      if (jumpHeld && this.canGlide && !this.isGliding && this.wizard.body.velocity.y > 0) {
+        this.startGliding();
+      }
 
-        if (!this.walkSound.isPlaying) {
-          this.walkSound.play();
-        }
-      } else {
-        // Am Boden & Stillstand: Animation stoppen & Sound anhalten
-        this.wizard.anims.stop();
-        this.wizard.setFrame(0);
+      // Physik während des Gleitens anpassen
+      if (this.isGliding) {
+        const timePassed = this.time.now - this.glideStartTime;
 
-        if (this.walkSound.isPlaying) {
-          this.walkSound.stop();
+        if (timePassed < this.maxGlideTime && jumpHeld) {
+          this.wizard.setVelocityY(80); // Langsamer Fall
+        } else {
+          this.stopGliding(); // Zeit abgelaufen oder Taste losgelassen
         }
       }
     }
+
+    // 4. Animationen & Sound steuern
+    if (this.isGliding) {
+      this.wizard.anims.play('fly_broom', true);
+      if (this.walkSound.isPlaying) this.walkSound.stop();
+    } else if (!isOnGround) {
+      this.wizard.anims.stop();
+      this.wizard.setFrame(1);
+      if (this.walkSound.isPlaying) this.walkSound.stop();
+    } else {
+      if (left || right) {
+        this.wizard.anims.play('walk', true);
+        if (!this.walkSound.isPlaying) this.walkSound.play();
+      } else {
+        this.wizard.anims.stop();
+        this.wizard.setFrame(0);
+        if (this.walkSound.isPlaying) this.walkSound.stop();
+      }
+    }
+  }
+
+  // ============================================================================================
+  // ============================================================================================
+  // Hitbox an sprite anpassen
+  setNormalHitbox() {
+    this.wizard.body.setSize(this.normalWidth, this.normalHeight);
+    // Optional: Versatz zurücksetzen, falls nötig
+    this.wizard.body.setOffset(
+      (this.wizard.width - this.normalWidth) / 2, 
+      this.wizard.height - this.normalHeight
+    );
+  }
+  
+  setBroomHitbox() {
+    this.wizard.body.setSize(this.broomWidth, this.broomHeight);
+    // Zentriert die Hitbox auf dem breiteren Besen-Frame
+    this.wizard.body.setOffset(
+      (this.wizard.width - this.broomWidth) / 2, 
+      this.wizard.height - this.broomHeight
+    );
   }
 
   // ============================================================================================
@@ -688,7 +757,7 @@ export class GameScene extends Phaser.Scene {
   // In castSpell():
 
   castSpell(element = 'fire') {
-    if (this.isDead || this.hasWon) return;
+    if (this.isDead || this.hasWon || this.isGliding) return;
 
     this.sound.play('spell-sound', { volume: 0.5 });
 
@@ -764,13 +833,13 @@ export class GameScene extends Phaser.Scene {
       const pushSpeed = 200; // Schwung nach links/rechts
       const pushDir = spell.flipX ? -pushSpeed : pushSpeed;
       const newDirection = pushDir > 0 ? 1 : -1;
-  
+
       // 1. Blick- und Laufrichtung des Gegners an den Windstoß anpassen
       enemy.setData('direction', newDirection);
-  
+
       // 2. Warterhythmus zurücksetzen, falls er gerade abspringen wollte
       enemy.setData('isWaiting', false);
-  
+
       // 3. Stärkeren Impuls nach oben und zur Seite geben
       enemy.setVelocityX(pushDir);
       enemy.setVelocityY(-300); // Höherer Wert (-300), damit er auch im Flug weggeschleudert wird
@@ -779,6 +848,23 @@ export class GameScene extends Phaser.Scene {
       this.sound.play('enemy-death-sound', { volume: 0.7 });
       enemy.destroy();
     }
+  }
+
+  // -------------------------------------
+  // Besen gleiten
+  // -------------------------------------
+  // Besen-Gleiten aktivieren
+  startGliding() {
+    this.isGliding = true;
+    this.canGlide = false; // Für diesen Luftaufenthalt verbraucht
+    this.glideStartTime = this.time.now;
+    this.setBroomHitbox();
+  }
+
+  // Besen-Gleiten beenden
+  stopGliding() {
+    this.isGliding = false;
+    this.setNormalHitbox();
   }
 
   // Zeigt eine Sprechblase über dem Zauberer an
