@@ -10,6 +10,7 @@ export class GameScene extends Phaser.Scene {
 
   init(data) {
     this.currentLevel = data.level || 1;
+    this.selectedSkin = data.skin || this.registry.get('selectedSkin') || 'wizard-blue';
     this.hasWon = false;
     this.isDead = false;
   }
@@ -35,10 +36,10 @@ export class GameScene extends Phaser.Scene {
     this.load.image('herbs', 'media/items/herbs.png');
 
     // Wizard
-    this.load.spritesheet('wizard', 'media/wizard/spritesheet-wizard.png', {
-      frameWidth: 120,
-      frameHeight: 104
-    });
+    this.load.spritesheet('wizard-blue', 'media/wizard/spritesheet-wizard-blue.png', {frameWidth: 120, frameHeight: 104});
+    this.load.spritesheet('wizard-yellow', 'media/wizard/spritesheet-wizard-yellow.png', {frameWidth: 120, frameHeight: 104});
+    this.load.spritesheet('wizard-red', 'media/wizard/spritesheet-wizard-red.png', {frameWidth: 120, frameHeight: 104});
+    this.load.spritesheet('wizard-green', 'media/wizard/spritesheet-wizard-green.png', {frameWidth: 120, frameHeight: 104});
 
     // Spell
     this.load.spritesheet('spell_anim', 'media/wizard/spritesheet-spell.png', {
@@ -161,19 +162,20 @@ export class GameScene extends Phaser.Scene {
     // WIZARD
     // ---------------------------------------------
     // Figur erstellen (nutzt standardmäßig Frame 0)
-    this.wizard = this.physics.add.sprite(100, 450, 'wizard');
+    this.wizard = this.physics.add.sprite(100, 450, this.selectedSkin);
     this.wizard.setBounce(0.1);
     this.wizard.setCollideWorldBounds(true);
     this.physics.add.collider(this.wizard, groundLayer);
     this.isDead = false;
 
-    
+    if (this.anims.exists('walk')) this.anims.remove('walk');
+    if (this.anims.exists('fly_broom')) this.anims.remove('fly_broom');
 
     // Lauf-Animation anlegen
     this.anims.create({
       key: 'walk',
       // Frame-Reihenfolge definieren: 0, 1, 0, 2
-      frames: this.anims.generateFrameNumbers('wizard', { frames: [0, 1, 0, 2] }),
+      frames: this.anims.generateFrameNumbers(this.selectedSkin, { frames: [0, 1, 0, 2] }),
       frameRate: 8,     // Wie schnell die Bilder wechseln (8 Bilder pro Sekunde)
       repeat: -1        // -1 bedeutet: Die Animation wiederholt sich endlos
     });
@@ -181,7 +183,7 @@ export class GameScene extends Phaser.Scene {
     // 1. Besen-Flug-Animation erstellen (nutzt die neuen Frames 3 und 4)
     this.anims.create({
       key: 'fly_broom',
-      frames: this.anims.generateFrameNumbers('wizard', { start: 3, end: 4 }),
+      frames: this.anims.generateFrameNumbers(this.selectedSkin, { start: 3, end: 4 }),
       frameRate: 6,
       repeat: -1
     });

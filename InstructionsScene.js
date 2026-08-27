@@ -9,7 +9,7 @@ export class InstructionsScene extends Phaser.Scene {
     this.load.audio('hover-button-sound', 'audio/Pickup_Gold_00.mp3');
 
     // Zauberer & Zauber (KORREKTUR: frameWidth auf 120 gesetzt)
-    this.load.spritesheet('wizard', 'media/wizard/spritesheet-wizard.png', {
+    this.load.spritesheet('wizard', 'media/wizard/spritesheet-wizard-blue.png', {
       frameWidth: 120,
       frameHeight: 104
     });
