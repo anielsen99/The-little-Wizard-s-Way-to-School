@@ -260,11 +260,6 @@ export class GameScene extends Phaser.Scene {
     // 2. Kollision: Zauber trifft Gegner -> hitEnemy wird ausgeführt
     this.physics.add.overlap(this.spells, this.enemies, this.hitEnemy, null, this);
 
-    // Tastatur-Event für die Leertaste (Einzelschuss beim Drücken)
-    this.input.keyboard.on('keydown-SPACE', () => {
-      this.castSpell();
-    });
-
     this.anims.create({
       key: 'spell_fly', // Der Name der Animation, den wir später benutzen
       frames: this.anims.generateFrameNumbers('spell_anim', {
@@ -452,14 +447,22 @@ export class GameScene extends Phaser.Scene {
           // PHASE 3: Absprung nach insgesamt 1000 ms
           this.time.delayedCall(1000, () => {
             if (enemy && enemy.active && enemy.body) {
-              enemy.setVelocityY(-250);      // Sprunghöhe
-              enemy.setVelocityX(60 * dir); // Sprungweite
-              enemy.setFrame(2);             // Flug-Frame
-              enemy.setData('isWaiting', false);
+              // NEU: Prüfen, ob der Gegner im Moment des Absprungs wirklich noch am Boden ist
+              const isStillOnGround = enemy.body.blocked.down || enemy.body.touching.down;
 
-              // NEU: Nur abspielen, wenn der Gegner im sichtbaren Bereich der Kamera ist
-              if (this.cameras.main.worldView.contains(enemy.x, enemy.y)) {
-                this.sound.play('slime-jump-sound', { volume: 0.4 }); // Lautstärke nach Bedarf anpassen
+              if (isStillOnGround && !enemy.getData('isFrozen')) {
+                enemy.setVelocityY(-250);      // Sprunghöhe
+                enemy.setVelocityX(60 * dir); // Sprungweite
+                enemy.setFrame(2);             // Flug-Frame
+                enemy.setData('isWaiting', false);
+
+                // Sound abspielen, wenn im Sichtbereich
+                if (this.cameras.main.worldView.contains(enemy.x, enemy.y)) {
+                  this.sound.play('slime-jump-sound', { volume: 0.2 });
+                }
+              } else {
+                // Falls er durch den Windstoß bereits in der Luft ist: Warterhythmus zurücksetzen
+                enemy.setData('isWaiting', false);
               }
             }
           });
@@ -740,11 +743,20 @@ export class GameScene extends Phaser.Scene {
       });
 
     } else if (element === 'wind') {
-      // WIND: Pustet den Gegner zurück
-      const pushDir = spell.flipX ? -350 : 350;
+      // WIND: Pustet den Gegner zurück (auch in der Luft)
+      const pushSpeed = 200; // Schwung nach links/rechts
+      const pushDir = spell.flipX ? -pushSpeed : pushSpeed;
+      const newDirection = pushDir > 0 ? 1 : -1;
+  
+      // 1. Blick- und Laufrichtung des Gegners an den Windstoß anpassen
+      enemy.setData('direction', newDirection);
+  
+      // 2. Warterhythmus zurücksetzen, falls er gerade abspringen wollte
+      enemy.setData('isWaiting', false);
+  
+      // 3. Stärkeren Impuls nach oben und zur Seite geben
       enemy.setVelocityX(pushDir);
-      enemy.setVelocityY(-150);
-
+      enemy.setVelocityY(-300); // Höherer Wert (-300), damit er auch im Flug weggeschleudert wird
     } else {
       // FEUER: Gegner sofort besiegen
       this.sound.play('enemy-death-sound', { volume: 0.7 });
