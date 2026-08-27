@@ -57,7 +57,7 @@ export class Overlay {
 
         retryBtn.on('pointerover', () => {
             retryBtn.setStyle({ color: '#ffffff', backgroundColor: '#6e1f1f' });
-            this.scene.sound.play('hover-button-sound', { volume: 0.3 });
+            this.scene.sound.play('hover-button-sound', { volume: 0.2 });
         });
 
         retryBtn.on('pointerout', () => retryBtn.setStyle({ color: '#ff6666', backgroundColor: '#3b1212' }));
@@ -82,7 +82,7 @@ export class Overlay {
 
         menuBtn.on('pointerover', () => {
             menuBtn.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });
-            this.scene.sound.play('hover-button-sound', { volume: 0.3 });
+            this.scene.sound.play('hover-button-sound', { volume: 0.2 });
         });
 
         menuBtn.on('pointerout', () => menuBtn.setStyle({ color: '#aaaaaa', backgroundColor: '#1f1f1f' }));
@@ -160,7 +160,7 @@ export class Overlay {
 
         actionBtn.on('pointerover', () => {
             actionBtn.setStyle({ color: '#ffffff', backgroundColor: '#185a32' });
-            this.scene.sound.play('hover-button-sound', { volume: 0.3 });
+            this.scene.sound.play('hover-button-sound', { volume: 0.2 });
         });
 
         actionBtn.on('pointerout', () => actionBtn.setStyle({ color: '#55ff99', backgroundColor: '#0d381e' }));
@@ -187,7 +187,7 @@ export class Overlay {
 
         menuBtn.on('pointerover', () => {
             menuBtn.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });
-            this.scene.sound.play('hover-button-sound', { volume: 0.3 });
+            this.scene.sound.play('hover-button-sound', { volume: 0.2 });
         });
 
         menuBtn.on('pointerout', () => menuBtn.setStyle({ color: '#aaaaaa', backgroundColor: '#1f1f1f' }));

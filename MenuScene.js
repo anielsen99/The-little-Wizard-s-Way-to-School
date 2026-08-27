@@ -26,7 +26,18 @@ export class MenuScene extends Phaser.Scene {
     const centerX = this.scale.width / 2;
     const centerY = this.scale.height / 2;
 
-    this.sound.play('menu-sound', { volume: 0.3 });
+    // Musik
+    let menuMusic = this.sound.get('menu-sound');
+
+    if (!menuMusic) {
+      menuMusic = this.sound.add('menu-sound', {
+        volume: 0.3,
+        loop: true
+      });
+      menuMusic.play();
+    } else if (!menuMusic.isPlaying) {
+      menuMusic.play();
+    }
 
     this.add.text(centerX, centerY - 100, "The Little Wizard's Way to School", {
       fontSize: '32px',
@@ -50,7 +61,7 @@ export class MenuScene extends Phaser.Scene {
     playButton.on('pointerover', () => {
       playButton.setStyle({ color: '#ffff55', backgroundColor: '#1b4332' });
       // Soundeffekt abspielen
-      this.sound.play('hover-button-sound', { volume: 0.3 });
+      this.sound.play('hover-button-sound', { volume: 0.2 });
     });
     playButton.on('pointerout', () => { playButton.setStyle({ color: '#55ff99', backgroundColor: '#081c15' }); });
     playButton.on('pointerdown', () => { this.scene.start('GameScene'); });
@@ -70,7 +81,7 @@ export class MenuScene extends Phaser.Scene {
     instructionsButton.on('pointerover', () => {
       instructionsButton.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });
       // Soundeffekt abspielen
-      this.sound.play('hover-button-sound', { volume: 0.3 });
+      this.sound.play('hover-button-sound', { volume: 0.2 });
     });
     instructionsButton.on('pointerout', () => { instructionsButton.setStyle({ color: '#aaaaaa', backgroundColor: '#1f1f1f' }); });
     instructionsButton.on('pointerdown', () => { this.scene.start('InstructionsScene'); });
@@ -90,7 +101,7 @@ export class MenuScene extends Phaser.Scene {
     settingsButton.on('pointerover', () => {
       settingsButton.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });
       // Soundeffekt abspielen
-      this.sound.play('hover-button-sound', { volume: 0.3 });
+      this.sound.play('hover-button-sound', { volume: 0.2 });
     });
     settingsButton.on('pointerout', () => { settingsButton.setStyle({ color: '#aaaaaa', backgroundColor: '#1f1f1f' }); });
     settingsButton.on('pointerdown', () => { this.scene.start('SettingsScene'); });
@@ -111,7 +122,7 @@ export class MenuScene extends Phaser.Scene {
     creditButton.on('pointerover', () => {
       creditButton.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });
       // Soundeffekt abspielen
-      this.sound.play('hover-button-sound', { volume: 0.3 });
+      this.sound.play('hover-button-sound', { volume: 0.2 });
     });
     creditButton.on('pointerout', () => { creditButton.setStyle({ color: '#aaaaaa', backgroundColor: '#1f1f1f' }); });
     creditButton.on('pointerdown', () => { this.scene.start('CreditsScene'); });
