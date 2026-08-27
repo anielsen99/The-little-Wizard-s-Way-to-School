@@ -75,39 +75,23 @@ export class GameScene extends Phaser.Scene {
     ]);
     this.load.audio('level-2-sound', 'audio/Opening_01.ogg');
     this.load.audio('level-3-sound', 'audio/game_music.ogg');
-
-    //Sound beim Gehen
-    this.load.audio('step-sound', 'audio/Footsteps/Footstep_Dirt_07.mp3');
-
-    //Sound beim Springen Wizard
-    this.load.audio('jump-sound', 'audio/jump.wav');
-
-    //Sound beim Einsammeln von Items
-    this.load.audio('item-sound', 'audio/Inventory_Open_00.mp3');
-
-    // Sound beim Sterben
-    this.load.audio('dying-sound', 'audio/Jingle_Lose_00.mp3');
-
-    // Sound beim Gewinnen
-    this.load.audio('winning-sound', 'audio/Jingle_Achievement_00.mp3');
-
-    // Sound bei Sprechblase
-    this.load.audio('speechbubble-sound', 'audio/huh.MP3');
-
-    // Sound der Spells
-    this.load.audio('spell-sound', 'audio/Spell_00.mp3');
-
-    // Sound Dying Enemy
-    this.load.audio('enemy-death-sound', 'audio/flyswatter.wav');
-
-    // Sound jumping Enemy
-    this.load.audio('slime-jump-sound', 'audio/slime_step_1.ogg');
-
+    
+    this.load.audio('step-sound', 'audio/Footsteps/Footstep_Dirt_07.mp3'); //Sound beim Gehen
+    this.load.audio('jump-sound', 'audio/jump.wav'); //Sound beim Springen Wizard
+    this.load.audio('item-sound', 'audio/Inventory_Open_00.mp3'); //Sound beim Einsammeln von Items
+    this.load.audio('dying-sound', 'audio/Jingle_Lose_00.mp3'); // Sound beim Sterben
+    this.load.audio('winning-sound', 'audio/Jingle_Achievement_00.mp3'); // Sound beim Gewinnen
+    this.load.audio('speechbubble-sound', 'audio/huh.MP3'); // Sound bei Sprechblase
+    this.load.audio('spell-sound', 'audio/Spell_00.mp3'); // Sound der Spells
+    this.load.audio('enemy-death-sound', 'audio/flyswatter.wav'); // Sound Dying Enemy
+    this.load.audio('slime-jump-sound', 'audio/slime_step_1.ogg'); // Sound jumping Enemy
   };
 
   // ============================================================================================
   create() {
-    // Level Höhe und Breite
+    // ---------------------------------------------
+    // LEVEL EINSTELLUNGEN
+    // ---------------------------------------------
     const levelSettings = {
       1: {
         width: 3840,
@@ -166,20 +150,11 @@ export class GameScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, levelWidth, levelHeight);
     this.physics.world.setBoundsCollision(true, true, false, false);
 
-
-    // Tilemap aus dem Cache erstellen
-    const map = this.make.tilemap({ key: `map-${this.currentLevel}` });
-
-    console.log('1. Echte Tileset-Namen in Level 3:', map.tilesets.map(t => t.name));
-    console.log('2. Echte Layer-Namen in Level 3:', map.layers.map(l => l.name));
-    // Tileset verknüpfen
-    const tileset = map.addTilesetImage(currentConfig.tiles, `tiles-set-${this.currentLevel}`);
-    // Ebene erstellen
-    const groundLayer = map.createLayer('plattforms', tileset, 0, 0);
-
-    // 4. Kollision für alle Kacheln aktivieren, die nicht leer sind
-    groundLayer.setCollisionByExclusion([-1]);
-
+    // Tilemap
+    const map = this.make.tilemap({ key: `map-${this.currentLevel}` }); // Tilemap aus dem Cache erstellen
+    const tileset = map.addTilesetImage(currentConfig.tiles, `tiles-set-${this.currentLevel}`); // Tileset verknüpfen
+    const groundLayer = map.createLayer('plattforms', tileset, 0, 0); // Ebene erstellen
+    groundLayer.setCollisionByExclusion([-1]); // Kollision für alle Kacheln aktivieren, die nicht leer sind
 
     // ---------------------------------------------
     // WIZARD
@@ -269,7 +244,7 @@ export class GameScene extends Phaser.Scene {
     }, null, this);
 
     // ---------------------------------------------
-    // ZAUBERSPRÜCHE (PROJECTILES)
+    // ZAUBERSPRÜCHE
     // ---------------------------------------------
     this.spells = this.physics.add.group({
       allowGravity: false // Alle Zauber fliegen ab sofort geradeaus
@@ -334,8 +309,6 @@ export class GameScene extends Phaser.Scene {
     // 3. Overlap-Prüfung zwischen Zauberer und den Gefahren-Objekten
     this.physics.add.overlap(this.wizard, this.hazards, this.hitHazard, null, this);
 
-
-
     // ---------------------------------------------
     // SCHLOSS
     // ---------------------------------------------
@@ -344,7 +317,6 @@ export class GameScene extends Phaser.Scene {
       currentConfig.castleY,
       currentConfig.endTexture
     );
-
     this.physics.add.overlap(this.wizard, this.castle, this.win, null, this);
 
     // ---------------------------------------------
@@ -353,9 +325,7 @@ export class GameScene extends Phaser.Scene {
     this.hud = new HUD(this);
     this.hud.create(this.quotas);
     this.overlay = new Overlay(this)
-
-    // Overlap-Prüfung aktivieren
-    this.physics.add.overlap(this.wizard, this.items, this.collectItem, null, this);
+    this.physics.add.overlap(this.wizard, this.items, this.collectItem, null, this); // Overlap-Prüfung aktivieren
 
     // ---------------------------------------------
     // KAMERA
@@ -383,7 +353,6 @@ export class GameScene extends Phaser.Scene {
       loop: true
     });
     this.bgMusic.play();
-
   }
 
   // ============================================================================================
@@ -396,9 +365,8 @@ export class GameScene extends Phaser.Scene {
     } else if (Phaser.Input.Keyboard.JustDown(this.keyL)) {
       this.castSpell('wind');
     }
-
-    // Wenn der Zauberer bereits stirbt, Steuerung ignorieren
-    if (this.isDead || this.hasWon) return;
+    
+    if (this.isDead || this.hasWon) return; // Wenn der Zauberer bereits stirbt, Steuerung ignorieren
 
     if (this.currentBubble) {
       this.currentBubble.setPosition(this.wizard.x, this.wizard.y - 170);
@@ -416,8 +384,7 @@ export class GameScene extends Phaser.Scene {
 
     // Gegner-Parabel-Sprünge mit 1000ms Pause
     this.enemies.getChildren().forEach(enemy => {
-      // Gefrorene Gegner springen nicht
-      if (enemy.getData('isFrozen')) return;
+      if (enemy.getData('isFrozen')) return; // Gefrorene Gegner springen nicht
 
       // Richtungswechsel bei Wand- oder Barrier-Kontakt
       if (enemy.body.blocked.right || enemy.body.touching.right) {
@@ -548,8 +515,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   // ============================================================================================
+  // ITEMS SAMMELN
   // ============================================================================================
-  // Items einsammeln (ohne Limit)
   collectItem(wizard, item) {
     const itemType = item.texture.key;
 
@@ -567,19 +534,16 @@ export class GameScene extends Phaser.Scene {
   }
 
   // ============================================================================================
-  // Tödliche Items einsammeln
+  // TÖDLICHE ITEMS EINSAMMELN
   // ============================================================================================
-  // Treffer-Logik für tödliche Items
   hitHazard(wizard, hazard) {
     if (this.isDead || this.hasWon) return;
-
-    // Optional: Das tödliche Item sofort ausblenden
-    hazard.disableBody(true, true);
-
-    // Ruft deine fertige Todes-Funktion auf (kümmert sich um Overlay, Sound & Stopps)
-    this.die();
+    hazard.disableBody(true, true); // Das tödliche Item sofort ausblenden
+    this.die(); // Ruft deine fertige Todes-Funktion auf (kümmert sich um Overlay, Sound & Stopps)
   }
 
+  // ============================================================================================
+  // STERBEN
   // ============================================================================================
   // Spieler stirbt und Level startet neu
   die() {
@@ -615,6 +579,8 @@ export class GameScene extends Phaser.Scene {
     this.sound.play('dying-sound', { volume: 0.3 }); // volume optional (0.0 bis 1.0)
   }
 
+  // ============================================================================================
+  // GEWINNEN
   // ============================================================================================
   win(wizard, castle) {
     // Abbrechen, wenn das Level bereits beendet oder der Spieler tot ist
@@ -681,9 +647,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   // ============================================================================================
-  // Zauberspruch abfeuern
-  // In castSpell():
-
+  // SPELLS ABFEUERN
+  // ============================================================================================
   castSpell(element = 'fire') {
     if (this.isDead || this.hasWon) return;
 
@@ -721,15 +686,16 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-
   // ============================================================================================
   // Treffer-Logik: Zauberspruch trifft auf Wand oder Boden
+  // ============================================================================================
   hitWall(spell, wall) {
     spell.destroy(); // Zauber sofort und komplett löschen
   }
 
   // ============================================================================================
   // Treffer-Logik zwischen Zauberspruch und Gegner
+  // ============================================================================================
   hitEnemy(spell, enemy) {
     const element = spell.getData('element');
 
@@ -778,7 +744,9 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  // Zeigt eine Sprechblase über dem Zauberer an
+  // ============================================================================================
+  // SPEECHBUBBLE
+  // ============================================================================================
   showSpeechBubble(text) {
     // Verhindert, dass die Sprechblase mehrfach gleichzeitig erzeugt wird
     if (this.isTalking) return;
