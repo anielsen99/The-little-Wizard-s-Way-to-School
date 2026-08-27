@@ -687,11 +687,12 @@ export class GameScene extends Phaser.Scene {
 
     // Färbung je nach Zauber
     if (element === 'ice') {
-      spell.setTint(0x00ffff); // Eisblau
+      spell.clearTint(); // Originalfarben (Cyan mit Pink)
     } else if (element === 'fire') {
-      spell.setTint(0xff4400); // Orange/Feuer
+      spell.clearTint();
+      spell.postFX.addColorMatrix().negative(); // Invertiert alle Farben (Cyan -> Feuriges Rot)
     } else if (element === 'wind') {
-      spell.setTint(0x88ffff); // Wind-Weiß/Hellgrün
+      spell.setTintFill(0xffffff); // Strahlendes Weiß
     }
 
     spell.body.setSize(spell.width, spell.height);
