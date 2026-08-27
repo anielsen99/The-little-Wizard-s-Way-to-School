@@ -9,6 +9,9 @@ export class MenuScene extends Phaser.Scene {
 
     // Soundeffect laden
     this.load.audio('hover-button-sound', 'audio/Pickup_Gold_00.mp3')
+
+    // Musik während Menu
+    this.load.audio('menu-sound', 'audio/02-Menu.ogg');
   }
 
   create() {
@@ -22,6 +25,8 @@ export class MenuScene extends Phaser.Scene {
 
     const centerX = this.scale.width / 2;
     const centerY = this.scale.height / 2;
+
+    this.sound.play('menu-sound', { volume: 0.3 });
 
     this.add.text(centerX, centerY - 100, "The Little Wizard's Way to School", {
       fontSize: '32px',
