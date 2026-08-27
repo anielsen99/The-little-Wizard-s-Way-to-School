@@ -133,6 +133,11 @@ export class GameScene extends Phaser.Scene {
     const levelHeight = currentConfig.height;
     this.quotas = currentConfig.quotas;
 
+    // Tasten für Zauber registrieren
+    this.keyJ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
+    this.keyK = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
+    this.keyL = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.L);
+
     // Hintergrund
     const bg = this.add.image(0, 0, currentConfig.bg)
       .setOrigin(0, 0)
@@ -235,7 +240,12 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.enemies, this.enemyBarriers);
 
     // Berührung mit Zauberer führt zum Tod
-    this.physics.add.collider(this.wizard, this.enemies, this.die, null, this);
+    // Neu: Gefrorene Gegner verletzen den Zauberer nicht
+    this.physics.add.collider(this.wizard, this.enemies, (wizard, enemy) => {
+      if (!enemy.getData('isFrozen')) {
+        this.die();
+      }
+    }, null, this);
 
     // ---------------------------------------------
     // ZAUBERSPRÜCHE (PROJECTILES)
@@ -370,6 +380,15 @@ export class GameScene extends Phaser.Scene {
 
   // ============================================================================================
   update() {
+    // Zaubersprüche auslösen
+    if (Phaser.Input.Keyboard.JustDown(this.keyJ)) {
+      this.castSpell('ice');
+    } else if (Phaser.Input.Keyboard.JustDown(this.keyK)) {
+      this.castSpell('fire');
+    } else if (Phaser.Input.Keyboard.JustDown(this.keyL)) {
+      this.castSpell('wind');
+    }
+
     // Wenn der Zauberer bereits stirbt, Steuerung ignorieren
     if (this.isDead || this.hasWon) return;
 
@@ -389,6 +408,9 @@ export class GameScene extends Phaser.Scene {
 
     // Gegner-Parabel-Sprünge mit 1000ms Pause
     this.enemies.getChildren().forEach(enemy => {
+      // Gefrorene Gegner springen nicht
+      if (enemy.getData('isFrozen')) return;
+
       // Richtungswechsel bei Wand- oder Barrier-Kontakt
       if (enemy.body.blocked.right || enemy.body.touching.right) {
         enemy.setData('direction', -1);
@@ -646,25 +668,31 @@ export class GameScene extends Phaser.Scene {
   // Zauberspruch abfeuern
   // In castSpell():
 
-  castSpell() {
+  castSpell(element = 'fire') {
     if (this.isDead || this.hasWon) return;
 
-    this.sound.play('spell-sound', { volume: 0.2 });
+    this.sound.play('spell-sound', { volume: 0.5 });
 
     const isFacingLeft = this.wizard.flipX;
     const spawnX = isFacingLeft ? this.wizard.x - 30 : this.wizard.x + 30;
     const spawnY = this.wizard.y - 10;
     const speed = isFacingLeft ? -400 : 400;
 
-    // 1. ÄNDERUNG: Nutze hier den neuen Spritesheet-Key 'spell_anim'
     const spell = this.spells.create(spawnX, spawnY, 'spell_anim');
-
-    // 2. ÄNDERUNG: Starte die Animation
     spell.play('spell_fly');
+    spell.setData('element', element); // Element auf Spruch speichern
+
+    // Färbung je nach Zauber
+    if (element === 'ice') {
+      spell.setTint(0x00ffff); // Eisblau
+    } else if (element === 'fire') {
+      spell.setTint(0xff4400); // Orange/Feuer
+    } else if (element === 'wind') {
+      spell.setTint(0x88ffff); // Wind-Weiß/Hellgrün
+    }
 
     spell.body.setSize(spell.width, spell.height);
     spell.body.allowGravity = false;
-
     spell.setVelocityX(speed);
     spell.setVelocityY(0);
     spell.setFlipX(isFacingLeft);
@@ -675,6 +703,8 @@ export class GameScene extends Phaser.Scene {
       }
     });
   }
+
+
   // ============================================================================================
   // Treffer-Logik: Zauberspruch trifft auf Wand oder Boden
   hitWall(spell, wall) {
@@ -684,14 +714,40 @@ export class GameScene extends Phaser.Scene {
   // ============================================================================================
   // Treffer-Logik zwischen Zauberspruch und Gegner
   hitEnemy(spell, enemy) {
+    const element = spell.getData('element');
+
     if (spell && spell.active) {
-      spell.destroy(); // Zauber löschen
+      spell.destroy();
     }
 
-    if (enemy && enemy.active) {
-      // 1. Soundeffekt abspielen
+    if (!enemy || !enemy.active) return;
+
+    if (element === 'ice') {
+      // EIS: Friert Gegner für 4 Sekunden ein (kann als Plattform genutzt werden)
+      enemy.setData('isFrozen', true);
+      enemy.setTint(0x00ffff);
+      enemy.setVelocity(0, 0);
+      enemy.body.setImmovable(true);
+      enemy.body.allowGravity = false;
+
+      this.time.delayedCall(4000, () => {
+        if (enemy && enemy.active) {
+          enemy.setData('isFrozen', false);
+          enemy.clearTint();
+          enemy.body.setImmovable(false);
+          enemy.body.allowGravity = true;
+        }
+      });
+
+    } else if (element === 'wind') {
+      // WIND: Pustet den Gegner zurück
+      const pushDir = spell.flipX ? -350 : 350;
+      enemy.setVelocityX(pushDir);
+      enemy.setVelocityY(-150);
+
+    } else {
+      // FEUER: Gegner sofort besiegen
       this.sound.play('enemy-death-sound', { volume: 0.7 });
-      // 2. Gegner aus der Spielwelt entfernen
       enemy.destroy();
     }
   }
