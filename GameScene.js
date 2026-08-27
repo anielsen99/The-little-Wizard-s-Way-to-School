@@ -1,6 +1,8 @@
 import { HUD } from './HUD.js';
 import { Overlay } from './Overlay.js';
 
+// test branch
+
 export class GameScene extends Phaser.Scene {
   constructor() {
     super({ key: 'GameScene' });
@@ -19,6 +21,7 @@ export class GameScene extends Phaser.Scene {
     // Hintergründe
     this.load.image('bg-level-1', 'media/backgrounds/background_level-1.jpg');
     this.load.image('bg-level-2', 'media/backgrounds/background_level-2.jpg');
+    this.load.image('bg-level-3', 'media/backgrounds/background_level-3.jpg');
 
     // Castle
     this.load.image('castle-closed', 'media/castle/castle-closed.png');
@@ -57,10 +60,12 @@ export class GameScene extends Phaser.Scene {
     // Tiles
     this.load.image('tiles-set-1', 'maps/tiles/tiles-1.png');
     this.load.image('tiles-set-2', 'maps/tiles/tiles-2.png');
+    this.load.image('tiles-set-3', 'maps/tiles/tiles-3.png');
 
     // Map Level
     this.load.tilemapTiledJSON('map-1', 'maps/level-1.tmj');
     this.load.tilemapTiledJSON('map-2', 'maps/level-2.tmj');
+    this.load.tilemapTiledJSON('map-3', 'maps/level-3.tmj');
 
     // Audio laden
     // Musik während Level 1
@@ -123,6 +128,16 @@ export class GameScene extends Phaser.Scene {
         quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
         castleX: 4760,
         castleY: 408,
+        endTexture: 'tent'
+      },
+      3: {
+        width: 4800,
+        height: 720,
+        bg: 'bg-level-3',
+        tiles: 'tiles-3',
+        quotas: { 'mushroom': 6, 'tree-resin': 6, 'herbs': 6 },
+        castleX: 4760,
+        castleY: 408,
         endTexture: 'castle-closed'
       }
     };
@@ -130,6 +145,11 @@ export class GameScene extends Phaser.Scene {
     const levelWidth = currentConfig.width;
     const levelHeight = currentConfig.height;
     this.quotas = currentConfig.quotas;
+
+    // Tasten für Zauber registrieren
+    this.keyJ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.J);
+    this.keyK = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.K);
+    this.keyL = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.L);
 
     // Hintergrund
     const bg = this.add.image(0, 0, currentConfig.bg)
@@ -144,6 +164,9 @@ export class GameScene extends Phaser.Scene {
 
     // Tilemap aus dem Cache erstellen
     const map = this.make.tilemap({ key: `map-${this.currentLevel}` });
+
+    console.log('1. Echte Tileset-Namen in Level 3:', map.tilesets.map(t => t.name));
+    console.log('2. Echte Layer-Namen in Level 3:', map.layers.map(l => l.name));
     // Tileset verknüpfen
     const tileset = map.addTilesetImage(currentConfig.tiles, `tiles-set-${this.currentLevel}`);
     // Ebene erstellen
@@ -233,7 +256,12 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.enemies, this.enemyBarriers);
 
     // Berührung mit Zauberer führt zum Tod
-    this.physics.add.collider(this.wizard, this.enemies, this.die, null, this);
+    // Neu: Gefrorene Gegner verletzen den Zauberer nicht
+    this.physics.add.collider(this.wizard, this.enemies, (wizard, enemy) => {
+      if (!enemy.getData('isFrozen')) {
+        this.die();
+      }
+    }, null, this);
 
     // ---------------------------------------------
     // ZAUBERSPRÜCHE (PROJECTILES)
@@ -247,11 +275,6 @@ export class GameScene extends Phaser.Scene {
 
     // 2. Kollision: Zauber trifft Gegner -> hitEnemy wird ausgeführt
     this.physics.add.overlap(this.spells, this.enemies, this.hitEnemy, null, this);
-
-    // Tastatur-Event für die Leertaste (Einzelschuss beim Drücken)
-    this.input.keyboard.on('keydown-SPACE', () => {
-      this.castSpell();
-    });
 
     this.anims.create({
       key: 'spell_fly', // Der Name der Animation, den wir später benutzen
@@ -368,6 +391,15 @@ export class GameScene extends Phaser.Scene {
 
   // ============================================================================================
   update() {
+    // Zaubersprüche auslösen
+    if (Phaser.Input.Keyboard.JustDown(this.keyJ)) {
+      this.castSpell('ice');
+    } else if (Phaser.Input.Keyboard.JustDown(this.keyK)) {
+      this.castSpell('fire');
+    } else if (Phaser.Input.Keyboard.JustDown(this.keyL)) {
+      this.castSpell('wind');
+    }
+
     // Wenn der Zauberer bereits stirbt, Steuerung ignorieren
     if (this.isDead || this.hasWon) return;
 
@@ -387,6 +419,9 @@ export class GameScene extends Phaser.Scene {
 
     // Gegner-Parabel-Sprünge mit 1000ms Pause
     this.enemies.getChildren().forEach(enemy => {
+      // Gefrorene Gegner springen nicht
+      if (enemy.getData('isFrozen')) return;
+
       // Richtungswechsel bei Wand- oder Barrier-Kontakt
       if (enemy.body.blocked.right || enemy.body.touching.right) {
         enemy.setData('direction', -1);
@@ -428,14 +463,22 @@ export class GameScene extends Phaser.Scene {
           // PHASE 3: Absprung nach insgesamt 1000 ms
           this.time.delayedCall(1000, () => {
             if (enemy && enemy.active && enemy.body) {
-              enemy.setVelocityY(-250);      // Sprunghöhe
-              enemy.setVelocityX(60 * dir); // Sprungweite
-              enemy.setFrame(2);             // Flug-Frame
-              enemy.setData('isWaiting', false);
+              // NEU: Prüfen, ob der Gegner im Moment des Absprungs wirklich noch am Boden ist
+              const isStillOnGround = enemy.body.blocked.down || enemy.body.touching.down;
 
-              // NEU: Nur abspielen, wenn der Gegner im sichtbaren Bereich der Kamera ist
-              if (this.cameras.main.worldView.contains(enemy.x, enemy.y)) {
-                this.sound.play('slime-jump-sound', { volume: 0.4 }); // Lautstärke nach Bedarf anpassen
+              if (isStillOnGround && !enemy.getData('isFrozen')) {
+                enemy.setVelocityY(-250);      // Sprunghöhe
+                enemy.setVelocityX(60 * dir); // Sprungweite
+                enemy.setFrame(2);             // Flug-Frame
+                enemy.setData('isWaiting', false);
+
+                // Sound abspielen, wenn im Sichtbereich
+                if (this.cameras.main.worldView.contains(enemy.x, enemy.y)) {
+                  this.sound.play('slime-jump-sound', { volume: 0.2 });
+                }
+              } else {
+                // Falls er durch den Windstoß bereits in der Luft ist: Warterhythmus zurücksetzen
+                enemy.setData('isWaiting', false);
               }
             }
           });
@@ -644,25 +687,32 @@ export class GameScene extends Phaser.Scene {
   // Zauberspruch abfeuern
   // In castSpell():
 
-  castSpell() {
+  castSpell(element = 'fire') {
     if (this.isDead || this.hasWon) return;
 
-    this.sound.play('spell-sound', { volume: 0.2 });
+    this.sound.play('spell-sound', { volume: 0.5 });
 
     const isFacingLeft = this.wizard.flipX;
     const spawnX = isFacingLeft ? this.wizard.x - 30 : this.wizard.x + 30;
     const spawnY = this.wizard.y - 10;
     const speed = isFacingLeft ? -400 : 400;
 
-    // 1. ÄNDERUNG: Nutze hier den neuen Spritesheet-Key 'spell_anim'
     const spell = this.spells.create(spawnX, spawnY, 'spell_anim');
-
-    // 2. ÄNDERUNG: Starte die Animation
     spell.play('spell_fly');
+    spell.setData('element', element); // Element auf Spruch speichern
+
+    // Färbung je nach Zauber
+    if (element === 'ice') {
+      spell.clearTint(); // Originalfarben (Cyan mit Pink)
+    } else if (element === 'fire') {
+      spell.clearTint();
+      spell.postFX.addColorMatrix().negative(); // Invertiert alle Farben (Cyan -> Feuriges Rot)
+    } else if (element === 'wind') {
+      spell.setTintFill(0xffffff); // Strahlendes Weiß
+    }
 
     spell.body.setSize(spell.width, spell.height);
     spell.body.allowGravity = false;
-
     spell.setVelocityX(speed);
     spell.setVelocityY(0);
     spell.setFlipX(isFacingLeft);
@@ -673,6 +723,8 @@ export class GameScene extends Phaser.Scene {
       }
     });
   }
+
+
   // ============================================================================================
   // Treffer-Logik: Zauberspruch trifft auf Wand oder Boden
   hitWall(spell, wall) {
@@ -682,14 +734,49 @@ export class GameScene extends Phaser.Scene {
   // ============================================================================================
   // Treffer-Logik zwischen Zauberspruch und Gegner
   hitEnemy(spell, enemy) {
+    const element = spell.getData('element');
+
     if (spell && spell.active) {
-      spell.destroy(); // Zauber löschen
+      spell.destroy();
     }
 
-    if (enemy && enemy.active) {
-      // 1. Soundeffekt abspielen
+    if (!enemy || !enemy.active) return;
+
+    if (element === 'ice') {
+      // EIS: Friert Gegner für 4 Sekunden ein (kann als Plattform genutzt werden)
+      enemy.setData('isFrozen', true);
+      enemy.setTint(0x00ffff);
+      enemy.setVelocity(0, 0);
+      enemy.body.setImmovable(true);
+      enemy.body.allowGravity = false;
+
+      this.time.delayedCall(4000, () => {
+        if (enemy && enemy.active) {
+          enemy.setData('isFrozen', false);
+          enemy.clearTint();
+          enemy.body.setImmovable(false);
+          enemy.body.allowGravity = true;
+        }
+      });
+
+    } else if (element === 'wind') {
+      // WIND: Pustet den Gegner zurück (auch in der Luft)
+      const pushSpeed = 200; // Schwung nach links/rechts
+      const pushDir = spell.flipX ? -pushSpeed : pushSpeed;
+      const newDirection = pushDir > 0 ? 1 : -1;
+  
+      // 1. Blick- und Laufrichtung des Gegners an den Windstoß anpassen
+      enemy.setData('direction', newDirection);
+  
+      // 2. Warterhythmus zurücksetzen, falls er gerade abspringen wollte
+      enemy.setData('isWaiting', false);
+  
+      // 3. Stärkeren Impuls nach oben und zur Seite geben
+      enemy.setVelocityX(pushDir);
+      enemy.setVelocityY(-300); // Höherer Wert (-300), damit er auch im Flug weggeschleudert wird
+    } else {
+      // FEUER: Gegner sofort besiegen
       this.sound.play('enemy-death-sound', { volume: 0.7 });
-      // 2. Gegner aus der Spielwelt entfernen
       enemy.destroy();
     }
   }
