@@ -124,7 +124,7 @@ export class GameScene extends Phaser.Scene {
         bg: 'bg-level-3',
         tiles: 'tiles-3',
         music: 'level-3-sound',
-        musicVolume: 0.5,
+        musicVolume: 0.35,
         quotas: { 'mushroom': 6, 'tree-resin': 6, 'herbs': 6 },
         castleX: 4760,
         castleY: 408,

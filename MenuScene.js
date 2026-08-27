@@ -31,7 +31,7 @@ export class MenuScene extends Phaser.Scene {
 
     if (!menuMusic) {
       menuMusic = this.sound.add('menu-sound', {
-        volume: 0.3,
+        volume: 0.7,
         loop: true
       });
       menuMusic.play();
@@ -64,7 +64,13 @@ export class MenuScene extends Phaser.Scene {
       this.sound.play('hover-button-sound', { volume: 0.2 });
     });
     playButton.on('pointerout', () => { playButton.setStyle({ color: '#55ff99', backgroundColor: '#081c15' }); });
-    playButton.on('pointerdown', () => { this.scene.start('GameScene'); });
+    playButton.on('pointerdown', () => {
+      const music = this.sound.get('menu-sound');
+      if (music) {
+        music.stop();
+      }
+      this.scene.start('GameScene');
+    });
 
     // ----------------------------
     // Anleitung
