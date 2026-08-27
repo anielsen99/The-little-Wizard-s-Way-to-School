@@ -21,6 +21,7 @@ export class GameScene extends Phaser.Scene {
     // Hintergründe
     this.load.image('bg-level-1', 'media/backgrounds/background_level-1.jpg');
     this.load.image('bg-level-2', 'media/backgrounds/background_level-2.jpg');
+    this.load.image('bg-level-3', 'media/backgrounds/background_level-3.jpg');
 
     // Castle
     this.load.image('castle-closed', 'media/castle/castle-closed.png');
@@ -59,10 +60,12 @@ export class GameScene extends Phaser.Scene {
     // Tiles
     this.load.image('tiles-set-1', 'maps/tiles/tiles-1.png');
     this.load.image('tiles-set-2', 'maps/tiles/tiles-2.png');
+    this.load.image('tiles-set-3', 'maps/tiles/tiles-3.png');
 
     // Map Level
     this.load.tilemapTiledJSON('map-1', 'maps/level-1.tmj');
     this.load.tilemapTiledJSON('map-2', 'maps/level-2.tmj');
+    this.load.tilemapTiledJSON('map-3', 'maps/level-3.tmj');
 
     // Audio laden
     // Musik während Level 1
@@ -125,6 +128,16 @@ export class GameScene extends Phaser.Scene {
         quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
         castleX: 4760,
         castleY: 408,
+        endTexture: 'tent'
+      },
+      3: {
+        width: 4800,
+        height: 720,
+        bg: 'bg-level-3',
+        tiles: 'tiles-3',
+        quotas: { 'mushroom': 6, 'tree-resin': 6, 'herbs': 6 },
+        castleX: 4760,
+        castleY: 408,
         endTexture: 'castle-closed'
       }
     };
@@ -151,6 +164,9 @@ export class GameScene extends Phaser.Scene {
 
     // Tilemap aus dem Cache erstellen
     const map = this.make.tilemap({ key: `map-${this.currentLevel}` });
+
+    console.log('1. Echte Tileset-Namen in Level 3:', map.tilesets.map(t => t.name));
+    console.log('2. Echte Layer-Namen in Level 3:', map.layers.map(l => l.name));
     // Tileset verknüpfen
     const tileset = map.addTilesetImage(currentConfig.tiles, `tiles-set-${this.currentLevel}`);
     // Ebene erstellen

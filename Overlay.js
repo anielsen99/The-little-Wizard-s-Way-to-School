@@ -55,10 +55,10 @@ export class Overlay {
             .setInteractive({ useHandCursor: true });
 
 
-            retryBtn.on('pointerover', () => {
-                retryBtn.setStyle({ color: '#ffffff', backgroundColor: '#6e1f1f' });
-                this.scene.sound.play('hover-button-sound', { volume: 0.3 });
-            });
+        retryBtn.on('pointerover', () => {
+            retryBtn.setStyle({ color: '#ffffff', backgroundColor: '#6e1f1f' });
+            this.scene.sound.play('hover-button-sound', { volume: 0.3 });
+        });
 
         retryBtn.on('pointerout', () => retryBtn.setStyle({ color: '#ff6666', backgroundColor: '#3b1212' }));
         retryBtn.on('pointerdown', () => {
@@ -80,10 +80,10 @@ export class Overlay {
             .setDepth(202)
             .setInteractive({ useHandCursor: true });
 
-            menuBtn.on('pointerover', () => {
-                menuBtn.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });
-                this.scene.sound.play('hover-button-sound', { volume: 0.3 });
-            });
+        menuBtn.on('pointerover', () => {
+            menuBtn.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });
+            this.scene.sound.play('hover-button-sound', { volume: 0.3 });
+        });
 
         menuBtn.on('pointerout', () => menuBtn.setStyle({ color: '#aaaaaa', backgroundColor: '#1f1f1f' }));
         menuBtn.on('pointerdown', () => {
@@ -100,7 +100,7 @@ export class Overlay {
         const centerY = height / 2;
 
         const currentLevel = this.scene.currentLevel || 1;
-        const isLevel1 = currentLevel === 1;
+        const maxLevel = 3; // Maximale Level-Anzahl
 
         // Dunkler, halbtransparenter Hintergrund
         const backdrop = this.scene.add.graphics();
@@ -121,8 +121,19 @@ export class Overlay {
         box.strokeRect(boxX, boxY, boxWidth, boxHeight, 12);
         box.setScrollFactor(0).setDepth(201);
 
-        // Titel: Zeigt an, was geschafft wurde
-        const titleText = isLevel1 ? '★ LEVEL 1 GESCHAFFT! ★' : '★ SPIEL GEWONNEN! ★';
+        // Dynamische Texte je nach Level
+        let titleText = `★ LEVEL ${currentLevel} GESCHAFFT! ★`;
+        let buttonLabel = `▶ Level ${currentLevel + 1} spielen`;
+        let nextLevel = currentLevel + 1;
+
+        // Wenn das letzte Level (Level 3) geschafft wurde:
+        if (currentLevel >= maxLevel) {
+            titleText = '★ SPIEL GEWONNEN! ★';
+            buttonLabel = 'Erneut spielen';
+            nextLevel = 1; // Startet danach wieder bei Level 1
+        }
+
+        // Titel
         this.scene.add.text(centerX, boxY + 45, titleText, {
             fontSize: '22px',
             fontFamily: 'monospace',
@@ -133,9 +144,7 @@ export class Overlay {
             .setScrollFactor(0)
             .setDepth(202);
 
-        // Haupt-Button: "Level 2 spielen" nach Level 1, sonst "Erneut spielen"
-        const buttonLabel = isLevel1 ? '▶ Level 2 spielen' : 'Erneut spielen';
-
+        // Haupt-Aktions-Button
         const actionBtn = this.scene.add.text(centerX, boxY + 115, buttonLabel, {
             fontSize: '18px',
             fontFamily: 'monospace',
@@ -149,23 +158,17 @@ export class Overlay {
             .setDepth(202)
             .setInteractive({ useHandCursor: true });
 
-
-            actionBtn.on('pointerover', () => {
-                actionBtn.setStyle({ color: '#ffffff', backgroundColor: '#185a32' });
-                this.scene.sound.play('hover-button-sound', { volume: 0.3 });
-            });
+        actionBtn.on('pointerover', () => {
+            actionBtn.setStyle({ color: '#ffffff', backgroundColor: '#185a32' });
+            this.scene.sound.play('hover-button-sound', { volume: 0.3 });
+        });
 
         actionBtn.on('pointerout', () => actionBtn.setStyle({ color: '#55ff99', backgroundColor: '#0d381e' }));
+
         actionBtn.on('pointerdown', () => {
             if (this.scene.bgMusic) this.scene.bgMusic.stop();
-
-            if (isLevel1) {
-                // Startet GameScene direkt mit Level 2
-                this.scene.scene.restart({ level: 2 });
-            } else {
-                // Nach Level 2 wieder bei Level 1 beginnen
-                this.scene.scene.restart({ level: 1 });
-            }
+            // Startet das nächste Level (Level 2, Level 3 oder wieder 1)
+            this.scene.scene.restart({ level: nextLevel });
         });
 
         // Button: Menü
@@ -182,13 +185,13 @@ export class Overlay {
             .setDepth(202)
             .setInteractive({ useHandCursor: true });
 
-
-            menuBtn.on('pointerover', () => { // GEÄNDERT: menuBtn statt menuBtnBtn
-                menuBtn.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });
-                this.scene.sound.play('hover-button-sound', { volume: 0.3 });
-            });
+        menuBtn.on('pointerover', () => {
+            menuBtn.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });
+            this.scene.sound.play('hover-button-sound', { volume: 0.3 });
+        });
 
         menuBtn.on('pointerout', () => menuBtn.setStyle({ color: '#aaaaaa', backgroundColor: '#1f1f1f' }));
+
         menuBtn.on('pointerdown', () => {
             if (this.scene.bgMusic) this.scene.bgMusic.stop();
             this.scene.scene.start('MenuScene');
