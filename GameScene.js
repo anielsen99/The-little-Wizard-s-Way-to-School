@@ -68,14 +68,13 @@ export class GameScene extends Phaser.Scene {
     this.load.tilemapTiledJSON('map-3', 'maps/level-3.tmj');
 
     // Audio laden
-    // Musik während Level 1
+    // Musik
     this.load.audio('level-1-sound', [
       'https://labs.phaser.io/assets/audio/CatAstroPhi_shmup_normal.ogg',
       'https://labs.phaser.io/assets/audio/CatAstroPhi_shmup_normal.mp3'
     ]);
-
-    // Musik während Level 2
     this.load.audio('level-2-sound', 'audio/Opening_01.ogg');
+    this.load.audio('level-3-sound', 'audio/game_music.ogg');
 
     //Sound beim Gehen
     this.load.audio('step-sound', 'audio/Footsteps/Footstep_Dirt_07.mp3');
@@ -115,6 +114,8 @@ export class GameScene extends Phaser.Scene {
         height: 720,
         bg: 'bg-level-1',
         tiles: 'tiles-1',
+        music: 'level-1-sound',
+        musicVolume: 0.1,
         quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
         castleX: 3800,
         castleY: 408,
@@ -125,6 +126,8 @@ export class GameScene extends Phaser.Scene {
         height: 720,
         bg: 'bg-level-2',
         tiles: 'tiles-2',
+        music: 'level-2-sound',
+        musicVolume: 0.45,
         quotas: { 'mushroom': 4, 'tree-resin': 4, 'herbs': 4 },
         castleX: 4760,
         castleY: 408,
@@ -135,6 +138,8 @@ export class GameScene extends Phaser.Scene {
         height: 720,
         bg: 'bg-level-3',
         tiles: 'tiles-3',
+        music: 'level-3-sound',
+        musicVolume: 0.35,
         quotas: { 'mushroom': 6, 'tree-resin': 6, 'herbs': 6 },
         castleX: 4760,
         castleY: 408,
@@ -373,16 +378,8 @@ export class GameScene extends Phaser.Scene {
     // ---------------------------------------------
     // Musik
     // ---------------------------------------------
-
-
-
-    // Welcher Key soll je nach Level genutzt werden?
-    const musicKey = this.currentLevel === 2 ? 'level-2-sound' : 'level-1-sound';
-    // Welche Lautstärke soll genutzt werden? (Level 1 leiser, Level 2 lauter)
-    const musicVolume = this.currentLevel === 2 ? 0.45 : 0.1;
-
-    this.bgMusic = this.sound.add(musicKey, {
-      volume: musicVolume,
+    this.bgMusic = this.sound.add(currentConfig.music, {
+      volume: currentConfig.musicVolume,
       loop: true
     });
     this.bgMusic.play();

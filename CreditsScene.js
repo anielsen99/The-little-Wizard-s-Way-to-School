@@ -34,7 +34,7 @@ export class CreditsScene extends Phaser.Scene {
     box.strokeRect(centerX - boxWidth / 2, boxY - boxHeight / 2, boxWidth, boxHeight, 12);
 
     // 3. Titel
-    this.add.text(centerX, 115, 'CREDITS', {
+    this.add.text(centerX, 110, 'CREDITS', {
       fontSize: '26px',
       fontFamily: 'monospace',
       fontStyle: 'bold',
@@ -42,21 +42,21 @@ export class CreditsScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // 4. Spiel & Grafik
-    this.add.text(centerX, 160, 'SPIEL & GRAFIK', {
+    this.add.text(centerX, 150, 'SPIEL & GRAFIK', {
       fontSize: '16px',
       fontFamily: 'monospace',
       fontStyle: 'bold',
       color: '#55ff99'
     }).setOrigin(0.5);
 
-    this.add.text(centerX, 185, 'Stefanie Kottmann & Amanda Nielsen', {
+    this.add.text(centerX, 175, 'Stefanie Kottmann & Amanda Nielsen', {
       fontSize: '15px',
       fontFamily: 'monospace',
       color: '#ffffff'
     }).setOrigin(0.5);
 
     // 5. Sound & Musik
-    this.add.text(centerX, 230, 'AUDIO & SOUNDEFFEKTE', {
+    this.add.text(centerX, 215, 'AUDIO & SOUNDEFFEKTE', {
       fontSize: '16px',
       fontFamily: 'monospace',
       fontStyle: 'bold',
@@ -64,41 +64,50 @@ export class CreditsScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // -- Little Robot Sound Factory
-    this.add.text(centerX, 260, 'Little Robot Sound Factory', {
+    this.add.text(centerX, 242, 'Little Robot Sound Factory', {
       fontSize: '14px',
       fontFamily: 'monospace',
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    this.createLink(centerX, 280, 'www.littlerobotsoundfactory.com', 'http://www.littlerobotsoundfactory.com');
+    this.createLink(centerX, 262, 'www.littlerobotsoundfactory.com', 'http://www.littlerobotsoundfactory.com');
 
     // -- AVGVSTA
-    this.add.text(centerX, 310, 'Sounds & Music by AVGVSTA', {
+    this.add.text(centerX, 290, 'Sounds & Music by AVGVSTA', {
       fontSize: '14px',
       fontFamily: 'monospace',
       color: '#ffffff'
     }).setOrigin(0.5);
 
     // -- Marcelo Fernandez
-    this.add.text(centerX, 345, '“Pixel adventures” – Music by Marcelo Fernandez', {
+    this.add.text(centerX, 320, '“Pixel adventures” – Music by Marcelo Fernandez', {
       fontSize: '14px',
       fontFamily: 'monospace',
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    this.createLink(centerX, 368, 'www.marcelofernandezmusic.com (CC BY 4.0)', 'http://www.marcelofernandezmusic.com');
+    this.createLink(centerX, 340, 'www.marcelofernandezmusic.com (CC BY 4.0)', 'http://www.marcelofernandezmusic.com');
 
     // -- Flush (OpenGameArt)
-    this.add.text(centerX, 405, 'Additional Sounds by Flush', {
+    this.add.text(centerX, 370, 'Additional Sounds by Flush', {
       fontSize: '14px',
       fontFamily: 'monospace',
       color: '#ffffff'
     }).setOrigin(0.5);
 
-    this.createLink(centerX, 428, 'opengameart.org/users/flush', 'https://opengameart.org/users/flush');
+    this.createLink(centerX, 390, 'opengameart.org/users/flush', 'https://opengameart.org/users/flush');
+
+    // -- enprogames (OpenGameArt)
+    this.add.text(centerX, 420, 'Additional Sounds by enprogames', {
+      fontSize: '14px',
+      fontFamily: 'monospace',
+      color: '#ffffff'
+    }).setOrigin(0.5);
+
+    this.createLink(centerX, 440, 'opengameart.org/users/enprogames', 'https://opengameart.org/users/enprogames');
 
     // 6. Zurück-Button
-    const backBtn = this.add.text(centerX, 505, '⬅ Zurück zum Menü', {
+    const backBtn = this.add.text(centerX, 500, '⬅ Zurück zum Menü', {
       fontSize: '16px',
       fontFamily: 'monospace',
       fontStyle: 'bold',
