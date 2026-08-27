@@ -37,7 +37,7 @@ export class MenuScene extends Phaser.Scene {
 
     // ----------------------------
     // Play
-    const playButton = this.add.text(centerX, centerY + 40, '▶ SPIEL STARTEN', {
+    const playButton = this.add.text(centerX, centerY + 20, '▶ SPIEL STARTEN', {
       fontSize: '24px',
       color: '#55ff99',
       fontFamily: 'monospace',
@@ -56,13 +56,33 @@ export class MenuScene extends Phaser.Scene {
     playButton.on('pointerdown', () => { this.scene.start('GameScene'); });
 
     // ----------------------------
-    // Settings
-    const settingsButton = this.add.text(centerX, centerY + 100, 'SETTINGS', {
+    // Anleitung
+    const instructionsButton = this.add.text(centerX, centerY + 100, 'ANLEITUNG', {
       fontSize: '24px',
       color: '#aaaaaa',
       fontFamily: 'monospace',
       backgroundColor: '#1f1f1f',
-      padding: { x: 70, y: 10 }
+      padding: { x: 63, y: 10 }
+    })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+
+    instructionsButton.on('pointerover', () => {
+      instructionsButton.setStyle({ color: '#ffffff', backgroundColor: '#3a3a3a' });
+      // Soundeffekt abspielen
+      this.sound.play('hover-button-sound', { volume: 0.3 });
+    });
+    instructionsButton.on('pointerout', () => { instructionsButton.setStyle({ color: '#aaaaaa', backgroundColor: '#1f1f1f' }); });
+    instructionsButton.on('pointerdown', () => { this.scene.start('SettingsScene'); });
+
+    // ----------------------------
+    // Settings
+    const settingsButton = this.add.text(centerX, centerY + 160, 'EINSTELLUNGEN', {
+      fontSize: '24px',
+      color: '#aaaaaa',
+      fontFamily: 'monospace',
+      backgroundColor: '#1f1f1f',
+      padding: { x: 35, y: 10 }
     })
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
@@ -77,7 +97,7 @@ export class MenuScene extends Phaser.Scene {
 
     // ----------------------------
     // Credits
-    const creditButton = this.add.text(centerX, centerY + 220, 'Credits', {
+    const creditButton = this.add.text(centerX, centerY + 240, 'Credits', {
       fontSize: '16px',
       fontFamily: 'monospace',
       fontStyle: 'bold',
